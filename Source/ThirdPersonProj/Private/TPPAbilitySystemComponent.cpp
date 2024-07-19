@@ -7,6 +7,10 @@
 void UTPPAbilitySystemComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &UTPPAbilitySystemComponent::OnGameplayEffectAppliedWrapper);
+
+	AddLooseGameplayTag(BaseGameplayTag);
 }
 
 void UTPPAbilitySystemComponent::BlockPrimaryAbilityInput()
@@ -42,4 +46,9 @@ bool UTPPAbilitySystemComponent::IsSecondaryAbilityInputBlocked() const
 void UTPPAbilitySystemComponent::CancelAbilitiesByTag(const FGameplayTagContainer& TagContainer)
 {
 	CancelAbilities(&TagContainer);
+}
+
+void UTPPAbilitySystemComponent::OnGameplayEffectAppliedWrapper(UAbilitySystemComponent* ABS, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle EffectHandle)
+{
+	OnGameplayEffectApplied.Broadcast(ABS, EffectSpec, EffectHandle, EffectSpec.CapturedSourceTags.GetSpecTags());
 }

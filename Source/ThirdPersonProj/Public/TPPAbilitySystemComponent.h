@@ -6,10 +6,12 @@
 #include "AbilitySystemComponent.h"
 #include "TPPAbilitySystemComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FHandleGameplayEffectApplied, UAbilitySystemComponent*, AbilitySystem, const FGameplayEffectSpec&, EffectSpec, FActiveGameplayEffectHandle, EffectHandle, const FGameplayTagContainer&, SourceTags);
+
 /**
  * 
  */
-UCLASS()
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent), Blueprintable)
 class THIRDPERSONPROJ_API UTPPAbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
@@ -39,5 +41,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void CancelAbilitiesByTag(const FGameplayTagContainer& TagContainer);
 
+protected:
 
+	/** Base gameplay tag associated with this ability system. Used to determine elemental combinations */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag BaseGameplayTag;
+
+	UPROPERTY(BlueprintAssignable)
+	FHandleGameplayEffectApplied OnGameplayEffectApplied;
+
+private:
+
+	UFUNCTION()
+	void OnGameplayEffectAppliedWrapper(UAbilitySystemComponent* ABS, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle EffectHandle);
 };

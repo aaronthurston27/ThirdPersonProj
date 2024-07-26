@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
+#include "GameplayEffectTypes.h"
 #include "TPPAbilitySystemComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FHandleGameplayEffectApplied, UAbilitySystemComponent*, AbilitySystem, const FGameplayEffectSpec&, EffectSpec, FActiveGameplayEffectHandle, EffectHandle, const FGameplayTagContainer&, SourceTags);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGameplayTagCountChanged, const FGameplayTag, GameplayTag, int32, Count);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBaseGameplayTagCountChanged, const FGameplayTag, GameplayTag, int32, Count);
 
 /**
  * 
@@ -43,15 +45,20 @@ public:
 
 protected:
 
-	/** Base gameplay tag associated with this ability system. Used to determine elemental combinations */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayTag BaseGameplayTag;
 
 	UPROPERTY(BlueprintAssignable)
-	FHandleGameplayEffectApplied OnGameplayEffectApplied;
+	FOnGameplayTagCountChanged OnAnyGameplayTagCountChanged;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnBaseGameplayTagCountChanged OnBaseGameplayTagCountChanged;
 
 private:
 
 	UFUNCTION()
-	void OnGameplayEffectAppliedWrapper(UAbilitySystemComponent* ABS, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle EffectHandle);
+	void HandleAnyGameplayTagCountChanged(const FGameplayTag Tag, int32 Count);
+
+	UFUNCTION()
+	void HandleBaseGameplayTagCountChanged(const FGameplayTag Tag, int32 Count);
 };

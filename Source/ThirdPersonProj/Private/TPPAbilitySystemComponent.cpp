@@ -8,9 +8,13 @@ void UTPPAbilitySystemComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &UTPPAbilitySystemComponent::OnGameplayEffectAppliedWrapper);
+	if (BaseGameplayTag.IsValid())
+	{
+		AddLooseGameplayTag(BaseGameplayTag);
+		RegisterGameplayTagEvent(BaseGameplayTag, EGameplayTagEventType::AnyCountChange).AddUObject(this, &UTPPAbilitySystemComponent::HandleBaseGameplayTagCountChanged);
+	}
 
-	AddLooseGameplayTag(BaseGameplayTag);
+	RegisterGenericGameplayTagEvent().AddUObject(this, &UTPPAbilitySystemComponent::HandleAnyGameplayTagCountChanged);
 }
 
 void UTPPAbilitySystemComponent::BlockPrimaryAbilityInput()
@@ -48,7 +52,15 @@ void UTPPAbilitySystemComponent::CancelAbilitiesByTag(const FGameplayTagContaine
 	CancelAbilities(&TagContainer);
 }
 
-void UTPPAbilitySystemComponent::OnGameplayEffectAppliedWrapper(UAbilitySystemComponent* ABS, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle EffectHandle)
+void UTPPAbilitySystemComponent::HandleAnyGameplayTagCountChanged(const FGameplayTag Tag, int32 Count)
 {
-	OnGameplayEffectApplied.Broadcast(ABS, EffectSpec, EffectHandle, EffectSpec.CapturedSourceTags.GetSpecTags());
+	if (!Tag.MatchesTag(BaseGameplayTag))
+	{
+		OnAnyGameplayTagCountChanged.Broadcast(Tag, Count);
+	}
+}
+
+void UTPPAbilitySystemComponent::HandleBaseGameplayTagCountChanged(const FGameplayTag Tag, int32 Count)
+{
+	OnBaseGameplayTagCountChanged.Broadcast(Tag, Count);
 }

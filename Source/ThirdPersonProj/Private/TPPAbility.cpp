@@ -14,3 +14,8 @@ void UTPPAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
+
+bool UTPPAbility::IsAbilityInputPressed() const
+{
+	return GetCurrentAbilitySpec()->InputPressed;
+}

@@ -29,6 +29,9 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	bool bCancelAbilityOnAbilityTagBlock = false;
 
+	UFUNCTION(BlueprintPure)
+	bool IsAbilityInputPressed() const;
+
 protected:
 
 	UPROPERTY(Transient, BlueprintReadOnly)

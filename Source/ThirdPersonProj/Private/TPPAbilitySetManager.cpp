@@ -52,24 +52,29 @@ void UTPPAbilitySetManager::SetActiveAbilitySet(UTPPAbilitySet* NewAbilitySet)
 
 	if (ActiveAbilitySet)
 	{
-		for (const FGameplayAbilitySpecHandle& SpecHandle : PrimaryAbilityHandles)
-		{
-			CachedAbilitySystem->ClearAbility(SpecHandle);
-		}
-		PrimaryAbilityHandles.Empty();
+		TArray<FGameplayAbilitySpecHandle> AllHandles;
+		AllHandles.Append(PrimaryAbilityHandles);
+		AllHandles.Append(SecondaryAbilityHandles);
+		AllHandles.Append(PassiveAbilityHandles);
+		AllHandles.Add(JumpAbilityHandle);
 
-		for (const FGameplayAbilitySpecHandle& SpecHandle : SecondaryAbilityHandles)
+		for (const FGameplayAbilitySpecHandle& SpecHandle : AllHandles)
 		{
 			CachedAbilitySystem->ClearAbility(SpecHandle);
 		}
+
+		PrimaryAbilityHandles.Empty();
 		SecondaryAbilityHandles.Empty();
+		PassiveAbilityHandles.Empty();
+		JumpAbilityHandle = FGameplayAbilitySpecHandle();
 	}
 
 	ActiveAbilitySet = NewAbilitySet;
 	
 	if (ActiveAbilitySet)
 	{
-		ActiveAbilitySet->GiveAbilities_ReturnHandles(CachedAbilitySystem, PrimaryAbilityHandles, SecondaryAbilityHandles);
+		TArray<FGameplayAbilitySpecHandle> Passives;
+		ActiveAbilitySet->GiveAbilities_ReturnHandles(CachedAbilitySystem, PrimaryAbilityHandles, SecondaryAbilityHandles, Passives, JumpAbilityHandle);
 
 		if (PrimaryAbilityHandles.Num() > 0)
 		{

@@ -4,6 +4,11 @@
 #include "TPPAbility.h"
 #include "ThirdPersonProj/ThirdPersonProjCharacter.h"
 
+UTPPAbility::UTPPAbility()
+{
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+}
+
 void UTPPAbility::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
 	Super::OnGiveAbility(ActorInfo, Spec);

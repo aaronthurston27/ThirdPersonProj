@@ -4,7 +4,7 @@
 #include "TPPAbilitySet.h"
 #include "AbilitySystemComponent.h"
 
-void UTPPAbilitySet::GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& PrimarySpecHandles, TArray<FGameplayAbilitySpecHandle>& SecondarySpecHandles) const
+void UTPPAbilitySet::GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& PrimarySpecHandles, TArray<FGameplayAbilitySpecHandle>& SecondarySpecHandles, TArray<FGameplayAbilitySpecHandle>& PassiveAbilityHandles, FGameplayAbilitySpecHandle& JumpAbilityHandle) const
 {
 	for (const FGameplayAbilityBindInfo& BindInfo : Abilities)
 	{
@@ -28,5 +28,23 @@ void UTPPAbilitySet::GiveAbilities_ReturnHandles(UAbilitySystemComponent* Abilit
 				SecondarySpecHandles.Add(SecondaryHandle);
 			}
 		}
+	}
+
+	for (const TSubclassOf<UGameplayAbility> AbilityClass : PassiveAbilities)
+	{
+		if (AbilityClass)
+		{
+			const FGameplayAbilitySpecHandle PassiveHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityClass, 1, 0));
+			if (PassiveHandle.IsValid())
+			{
+				PassiveAbilityHandles.Add(PassiveHandle);
+			}
+		}
+	}
+
+	if (JumpAbility.GameplayAbilityClass)
+	{
+		// Ability 7 is jump.
+		JumpAbilityHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(JumpAbility.GameplayAbilityClass, 1, (int32)EGameplayAbilityInputBinds::Ability7));
 	}
 }

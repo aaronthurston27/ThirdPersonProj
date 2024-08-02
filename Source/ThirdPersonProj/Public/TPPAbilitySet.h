@@ -19,8 +19,14 @@ class THIRDPERSONPROJ_API UTPPAbilitySet : public UGameplayAbilitySet
 public:
 
 	UPROPERTY(EditAnywhere, Category = AbilitySet)
-	TArray<FGameplayAbilityBindInfo>	SecondaryAbilities;
+	TArray<FGameplayAbilityBindInfo> SecondaryAbilities;
 
-	virtual void GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& PrimarySpecHandles, TArray<FGameplayAbilitySpecHandle>& SecondarySpecHandles) const;
+	UPROPERTY(EditAnywhere, Category = AbilitySet)
+	TArray < TSubclassOf < UGameplayAbility >> PassiveAbilities;
+
+	UPROPERTY(EditAnywhere, Category = AbilitySet)
+	FGameplayAbilityBindInfo JumpAbility;
+
+	virtual void GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& PrimarySpecHandles, TArray<FGameplayAbilitySpecHandle>& SecondarySpecHandles, TArray<FGameplayAbilitySpecHandle>& PassiveAbilityHandles, FGameplayAbilitySpecHandle& JumpAbilityHandle) const;
 	
 };

@@ -56,6 +56,12 @@ protected:
 	UPROPERTY(Transient)
 	TArray<FGameplayAbilitySpecHandle> SecondaryAbilityHandles;
 
+	UPROPERTY(Transient)
+	TArray<FGameplayAbilitySpecHandle> PassiveAbilityHandles;
+
+	UPROPERTY(Transient)
+	FGameplayAbilitySpecHandle JumpAbilityHandle;
+
 public:
 
 	UFUNCTION(BlueprintCallable)

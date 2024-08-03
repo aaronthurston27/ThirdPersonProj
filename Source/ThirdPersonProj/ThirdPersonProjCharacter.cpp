@@ -93,6 +93,11 @@ UTPPMovementComponent* AThirdPersonProjCharacter::GetThirdPersonMovementComponen
 	return Cast<UTPPMovementComponent>(GetCharacterMovement());
 }
 
+void AThirdPersonProjCharacter::OnJumped_Implementation()
+{
+	OnJumpedEvent.Broadcast();
+}
+
 FVector2D AThirdPersonProjCharacter::GetDesiredMovementVector_Implementation() const
 {
 	return GetLastRawInputVector();

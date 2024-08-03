@@ -18,6 +18,8 @@ class UTPPAbilitySystemComponent;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnJumped);
+
 UCLASS(config=Game)
 class AThirdPersonProjCharacter : public ACharacter
 {
@@ -129,5 +131,12 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	UTPPMovementComponent* GetThirdPersonMovementComponent() const;
+
+	virtual void OnJumped_Implementation() override;
+
+protected:
+
+	UPROPERTY(BlueprintAssignable)
+	FOnJumped OnJumpedEvent;
 };
 

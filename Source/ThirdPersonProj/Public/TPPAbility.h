@@ -34,6 +34,16 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsAbilityInputPressed() const;
 
+	UPROPERTY(EditDefaultsOnly)
+	bool bRespondToInputWhenInactive = false;
+
+	UPROPERTY(Transient)
+	bool bShouldAbilityRespondToInput = true;
+
+	void SetAbilityInputResponse(bool bShouldRespondToInput = false);
+
+	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr, OUT FGameplayTagContainer* OptionalRelevantTags = nullptr) const;
+
 protected:
 
 	UPROPERTY(Transient, BlueprintReadOnly)

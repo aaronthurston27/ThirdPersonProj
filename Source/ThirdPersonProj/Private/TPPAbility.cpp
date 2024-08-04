@@ -24,3 +24,18 @@ bool UTPPAbility::IsAbilityInputPressed() const
 {
 	return GetCurrentAbilitySpec()->InputPressed;
 }
+
+void UTPPAbility::SetAbilityInputResponse(bool bShouldRespondToInput)
+{
+	bShouldAbilityRespondToInput = bShouldRespondToInput;
+}
+
+bool UTPPAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
+{
+	if (!bShouldAbilityRespondToInput && !bRespondToInputWhenInactive)
+	{
+		return false;
+	}
+
+	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
+}

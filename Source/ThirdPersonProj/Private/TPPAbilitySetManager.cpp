@@ -97,12 +97,26 @@ void UTPPAbilitySetManager::SetActivePrimaryAbility(const FGameplayAbilitySpecHa
 		return;
 	}
 
+	if (PrimaryActiveAbility.IsValid())
+	{
+		UTPPAbility* CurrentPrimaryAbility = Cast<UTPPAbility>(CachedAbilitySystem->FindAbilitySpecFromHandle(PrimaryActiveAbility)->GetPrimaryInstance());
+		if (CurrentPrimaryAbility && !CurrentPrimaryAbility->bRespondToInputWhenInactive)
+		{
+			CurrentPrimaryAbility->SetAbilityInputResponse(false);
+		}
+	}
+
 	PrimaryActiveAbility = SpecHandle;
 	FGameplayAbilitySpec* PrimaryAbilitySpec = CachedAbilitySystem->FindAbilitySpecFromHandle(SpecHandle);
 	UTPPAbility* TPPAbility = PrimaryAbilitySpec ? Cast<UTPPAbility>(PrimaryAbilitySpec->Ability) : nullptr;
-	if (TPPAbility && TPPAbility->bShouldAbilityAutoActivate)
+	if (TPPAbility)
 	{
-		CachedAbilitySystem->TryActivateAbility(SpecHandle);
+		if (TPPAbility->bShouldAbilityAutoActivate)
+		{
+			CachedAbilitySystem->TryActivateAbility(SpecHandle);
+		}
+
+		TPPAbility->SetAbilityInputResponse(true);
 	}
 }
 
@@ -115,12 +129,26 @@ void UTPPAbilitySetManager::SetActiveSecondaryAbility(const FGameplayAbilitySpec
 		return;
 	}
 
+	if (SecondaryActiveAbility.IsValid())
+	{
+		UTPPAbility* CurrentSecondaryAbility = Cast<UTPPAbility>(CachedAbilitySystem->FindAbilitySpecFromHandle(SecondaryActiveAbility)->GetPrimaryInstance());
+		if (CurrentSecondaryAbility && !CurrentSecondaryAbility->bRespondToInputWhenInactive)
+		{
+			CurrentSecondaryAbility->SetAbilityInputResponse(false);
+		}
+	}
+
 	SecondaryActiveAbility = SpecHandle;
 	FGameplayAbilitySpec* SecondaryAbilitySpec = CachedAbilitySystem->FindAbilitySpecFromHandle(SpecHandle);
 	UTPPAbility* TPPAbility = SecondaryAbilitySpec ? Cast<UTPPAbility>(SecondaryAbilitySpec->Ability) : nullptr;
-	if (TPPAbility && TPPAbility->bShouldAbilityAutoActivate)
+	if (TPPAbility)
 	{
-		CachedAbilitySystem->TryActivateAbility(SpecHandle);
+		if (TPPAbility->bShouldAbilityAutoActivate)
+		{
+			CachedAbilitySystem->TryActivateAbility(SpecHandle);
+		}
+
+		TPPAbility->SetAbilityInputResponse(true);
 	}
 }
 
@@ -144,4 +172,32 @@ bool UTPPAbilitySetManager::IsSecondaryAbilityActive() const
 
 	const FGameplayAbilitySpec* SecondaryAbilitySpec = CachedAbilitySystem->FindAbilitySpecFromHandle(SecondaryActiveAbility);
 	return SecondaryAbilitySpec ? SecondaryAbilitySpec->IsActive() : false;
+}
+
+void UTPPAbilitySetManager::SelectNextPrimaryAbility()
+{
+	int32 CurrentPrimaryAbilityIndex = -1;
+	CurrentPrimaryAbilityIndex = PrimaryAbilityHandles.Find(PrimaryActiveAbility);
+	if (CurrentPrimaryAbilityIndex != -1)
+	{
+		const int32 NextAbilityIndex = (CurrentPrimaryAbilityIndex + 1) % PrimaryAbilityHandles.Num();
+		if (PrimaryAbilityHandles.IsValidIndex(NextAbilityIndex))
+		{
+			SetActivePrimaryAbility(PrimaryAbilityHandles[NextAbilityIndex]);
+		}
+	}
+}
+
+void UTPPAbilitySetManager::SelectNextSecondaryAbility()
+{
+	int32 CurrentSecondaryAbilityIndex = -1;
+	CurrentSecondaryAbilityIndex = SecondaryAbilityHandles.Find(SecondaryActiveAbility);
+	if (CurrentSecondaryAbilityIndex != -1)
+	{
+		const int32 NextAbilityIndex = (CurrentSecondaryAbilityIndex + 1) % SecondaryAbilityHandles.Num();
+		if (SecondaryAbilityHandles.IsValidIndex(NextAbilityIndex))
+		{
+			SetActiveSecondaryAbility(SecondaryAbilityHandles[NextAbilityIndex]);
+		}
+	}
 }

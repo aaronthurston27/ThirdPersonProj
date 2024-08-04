@@ -78,5 +78,9 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	bool IsSecondaryAbilityActive() const;
+
+	void SelectNextPrimaryAbility();
+
+	void SelectNextSecondaryAbility();
 		
 };

@@ -12,6 +12,7 @@
 #include "InputActionValue.h"
 #include "TPPMovementComponent.h"
 #include "TPPAbilitySystemComponent.h"
+#include "TPPAbilitySetManager.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -55,6 +56,7 @@ AThirdPersonProjCharacter::AThirdPersonProjCharacter()
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 
 	TPPAbilitySystemComponent = CreateDefaultSubobject<UTPPAbilitySystemComponent>(TEXT("Ability System Component"));
+	AbilitySetManager = CreateDefaultSubobject<UTPPAbilitySetManager>(TEXT("Ability Set Manager"));
 }
 
 void AThirdPersonProjCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue, bool bForce)
@@ -135,6 +137,9 @@ void AThirdPersonProjCharacter::SetupPlayerInputComponent(UInputComponent* Playe
 
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Started, this, &AThirdPersonProjCharacter::OnRunPressed);
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &AThirdPersonProjCharacter::OnRunReleased);
+
+		EnhancedInputComponent->BindAction(CyclePrimaryAbilityAction, ETriggerEvent::Triggered, this, &AThirdPersonProjCharacter::OnCyclePrimaryAbilityPressed);
+		EnhancedInputComponent->BindAction(CycleSecondaryAbilityAction, ETriggerEvent::Triggered, this, &AThirdPersonProjCharacter::OnCycleSecondaryAbilityPressed);
 	}
 	else
 	{
@@ -218,6 +223,22 @@ void AThirdPersonProjCharacter::OnRunReleased(const FInputActionValue& Value)
 	if (MoveComp)
 	{
 		MoveComp->SetWantsToRun(false);
+	}
+}
+
+void AThirdPersonProjCharacter::OnCyclePrimaryAbilityPressed(const FInputActionValue& Value)
+{
+	if (AbilitySetManager)
+	{
+		AbilitySetManager->SelectNextPrimaryAbility();
+	}
+}
+
+void AThirdPersonProjCharacter::OnCycleSecondaryAbilityPressed(const FInputActionValue& Value)
+{
+	if (AbilitySetManager)
+	{
+		AbilitySetManager->SelectNextSecondaryAbility();
 	}
 }
 

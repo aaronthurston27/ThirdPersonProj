@@ -15,6 +15,7 @@ class UInputAction;
 struct FInputActionValue;
 class UTPPMovementComponent;
 class UTPPAbilitySystemComponent;
+class UTPPAbilitySetManager;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -58,10 +59,19 @@ class AThirdPersonProjCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* CrouchAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* CyclePrimaryAbilityAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* CycleSecondaryAbilityAction;
+
 protected:
 
 	UPROPERTY(VisibleAnywhere, Transient, BlueprintReadOnly)
 	UTPPAbilitySystemComponent* TPPAbilitySystemComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities")
+	UTPPAbilitySetManager* AbilitySetManager;
 
 public:
 
@@ -87,6 +97,10 @@ protected:
 	void OnRunPressed(const FInputActionValue& Value);
 
 	void OnRunReleased(const FInputActionValue& Value);
+
+	void OnCyclePrimaryAbilityPressed(const FInputActionValue& Value);
+
+	void OnCycleSecondaryAbilityPressed(const FInputActionValue& Value);
 			
 
 protected:

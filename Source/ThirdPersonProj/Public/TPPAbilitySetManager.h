@@ -45,10 +45,10 @@ protected:
 	UTPPAbilitySet* ActiveAbilitySet = nullptr;
 
 	UPROPERTY(Transient)
-	FGameplayAbilitySpecHandle PrimaryActiveAbility;
+	FGameplayAbilitySpecHandle ActivePrimaryAbilityHandle;
 
 	UPROPERTY(Transient)
-	FGameplayAbilitySpecHandle SecondaryActiveAbility;
+	FGameplayAbilitySpecHandle ActiveSecondaryAbilityHandle;
 
 	UPROPERTY(Transient)
 	TArray<FGameplayAbilitySpecHandle> PrimaryAbilityHandles;

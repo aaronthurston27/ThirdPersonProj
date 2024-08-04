@@ -25,28 +25,52 @@ class THIRDPERSONPROJ_API UTPPAbility : public UGameplayAbility
 
 public:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	bool bShouldAbilityAutoActivate = false;
-
-	UPROPERTY(EditDefaultsOnly)
-	bool bCancelAbilityOnAbilityTagBlock = false;
-
-	UFUNCTION(BlueprintPure)
-	bool IsAbilityInputPressed() const;
-
-	UPROPERTY(EditDefaultsOnly)
-	bool bRespondToInputWhenInactive = false;
-
-	UPROPERTY(Transient)
-	bool bShouldAbilityRespondToInput = true;
-
 	void SetAbilityInputResponse(bool bShouldRespondToInput = false);
 
 	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr, OUT FGameplayTagContainer* OptionalRelevantTags = nullptr) const;
 
 protected:
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bShouldAbilityAutoActivate = false;
+
+	UPROPERTY(EditDefaultsOnly)
+	bool bCancelAbilityOnAbilityTagBlock = false;
+
+	UPROPERTY(EditDefaultsOnly)
+	bool bRespondToInputWhenInactive = false;
+
+	UPROPERTY(EditDefaultsOnly)
+	bool bCancelAbilityOnUnequip = true;
+
+	UPROPERTY(Transient)
+	bool bShouldAbilityRespondToInput = true;
+
 	UPROPERTY(Transient, BlueprintReadOnly)
 	AThirdPersonProjCharacter* CachedCharacterOwner = nullptr;
+
+public:
+
+	UFUNCTION(BlueprintPure)
+	bool ShouldAbilityActivateOnEquip() const { return bShouldAbilityAutoActivate; }
+
+	UFUNCTION(BlueprintPure)
+	bool ShouldCancelAbilityOnUnequip() const { return bCancelAbilityOnUnequip;  }
+
+	UFUNCTION(BlueprintPure)
+	bool ShouldAbilityRespondToInputWhenInactive() const { return bRespondToInputWhenInactive; }
+
+	UFUNCTION(BlueprintPure)
+	bool IsAbilityInputPressed() const;
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnAbilityEquipped();
+
+	void OnAbilityEquipped_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnAbilityUnequipped();
+
+	void OnAbilityUnequipped_Implementation();
 
 };

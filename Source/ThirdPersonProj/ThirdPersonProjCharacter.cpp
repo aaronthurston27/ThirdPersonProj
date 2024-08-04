@@ -133,13 +133,13 @@ void AThirdPersonProjCharacter::SetupPlayerInputComponent(UInputComponent* Playe
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AThirdPersonProjCharacter::Look);
 
-		EnhancedInputComponent->BindAction(WalkAction, ETriggerEvent::Triggered, this, &AThirdPersonProjCharacter::OnWalkPressed);
+		EnhancedInputComponent->BindAction(WalkAction, ETriggerEvent::Started, this, &AThirdPersonProjCharacter::OnWalkPressed);
 
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Started, this, &AThirdPersonProjCharacter::OnRunPressed);
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &AThirdPersonProjCharacter::OnRunReleased);
 
-		EnhancedInputComponent->BindAction(CyclePrimaryAbilityAction, ETriggerEvent::Triggered, this, &AThirdPersonProjCharacter::OnCyclePrimaryAbilityPressed);
-		EnhancedInputComponent->BindAction(CycleSecondaryAbilityAction, ETriggerEvent::Triggered, this, &AThirdPersonProjCharacter::OnCycleSecondaryAbilityPressed);
+		EnhancedInputComponent->BindAction(CyclePrimaryAbilityAction, ETriggerEvent::Started, this, &AThirdPersonProjCharacter::OnCyclePrimaryAbilityPressed);
+		EnhancedInputComponent->BindAction(CycleSecondaryAbilityAction, ETriggerEvent::Started, this, &AThirdPersonProjCharacter::OnCycleSecondaryAbilityPressed);
 	}
 	else
 	{

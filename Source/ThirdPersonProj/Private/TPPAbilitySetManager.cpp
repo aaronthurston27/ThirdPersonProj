@@ -97,26 +97,27 @@ void UTPPAbilitySetManager::SetActivePrimaryAbility(const FGameplayAbilitySpecHa
 		return;
 	}
 
-	if (PrimaryActiveAbility.IsValid())
+	if (ActivePrimaryAbilityHandle.IsValid())
 	{
-		UTPPAbility* CurrentPrimaryAbility = Cast<UTPPAbility>(CachedAbilitySystem->FindAbilitySpecFromHandle(PrimaryActiveAbility)->GetPrimaryInstance());
-		if (CurrentPrimaryAbility && !CurrentPrimaryAbility->bRespondToInputWhenInactive)
+		UTPPAbility* CurrentPrimaryAbility = Cast<UTPPAbility>(CachedAbilitySystem->FindAbilitySpecFromHandle(ActivePrimaryAbilityHandle)->GetPrimaryInstance());
+		if (CurrentPrimaryAbility)
 		{
-			CurrentPrimaryAbility->SetAbilityInputResponse(false);
+			CurrentPrimaryAbility->OnAbilityUnequipped();
 		}
 	}
 
-	PrimaryActiveAbility = SpecHandle;
-	FGameplayAbilitySpec* PrimaryAbilitySpec = CachedAbilitySystem->FindAbilitySpecFromHandle(SpecHandle);
-	UTPPAbility* TPPAbility = PrimaryAbilitySpec ? Cast<UTPPAbility>(PrimaryAbilitySpec->Ability) : nullptr;
+	ActivePrimaryAbilityHandle = SpecHandle;
+
+	const FGameplayAbilitySpec* PrimaryAbilitySpec = CachedAbilitySystem->FindAbilitySpecFromHandle(SpecHandle);
+	UTPPAbility* TPPAbility = PrimaryAbilitySpec ? Cast<UTPPAbility>(PrimaryAbilitySpec->GetPrimaryInstance()) : nullptr;
 	if (TPPAbility)
 	{
-		if (TPPAbility->bShouldAbilityAutoActivate)
+		TPPAbility->OnAbilityEquipped();
+
+		if (TPPAbility->ShouldAbilityActivateOnEquip())
 		{
 			CachedAbilitySystem->TryActivateAbility(SpecHandle);
 		}
-
-		TPPAbility->SetAbilityInputResponse(true);
 	}
 }
 
@@ -129,26 +130,27 @@ void UTPPAbilitySetManager::SetActiveSecondaryAbility(const FGameplayAbilitySpec
 		return;
 	}
 
-	if (SecondaryActiveAbility.IsValid())
+	if (ActiveSecondaryAbilityHandle.IsValid())
 	{
-		UTPPAbility* CurrentSecondaryAbility = Cast<UTPPAbility>(CachedAbilitySystem->FindAbilitySpecFromHandle(SecondaryActiveAbility)->GetPrimaryInstance());
-		if (CurrentSecondaryAbility && !CurrentSecondaryAbility->bRespondToInputWhenInactive)
+		UTPPAbility* CurrentSecondaryAbility = Cast<UTPPAbility>(CachedAbilitySystem->FindAbilitySpecFromHandle(ActiveSecondaryAbilityHandle)->GetPrimaryInstance());
+		if (CurrentSecondaryAbility)
 		{
-			CurrentSecondaryAbility->SetAbilityInputResponse(false);
+			CurrentSecondaryAbility->OnAbilityUnequipped();
 		}
 	}
 
-	SecondaryActiveAbility = SpecHandle;
-	FGameplayAbilitySpec* SecondaryAbilitySpec = CachedAbilitySystem->FindAbilitySpecFromHandle(SpecHandle);
+	ActiveSecondaryAbilityHandle = SpecHandle;
+
+	const FGameplayAbilitySpec* SecondaryAbilitySpec = CachedAbilitySystem->FindAbilitySpecFromHandle(SpecHandle);
 	UTPPAbility* TPPAbility = SecondaryAbilitySpec ? Cast<UTPPAbility>(SecondaryAbilitySpec->Ability) : nullptr;
 	if (TPPAbility)
 	{
-		if (TPPAbility->bShouldAbilityAutoActivate)
+		TPPAbility->OnAbilityEquipped();
+
+		if (TPPAbility->ShouldAbilityActivateOnEquip())
 		{
 			CachedAbilitySystem->TryActivateAbility(SpecHandle);
 		}
-
-		TPPAbility->SetAbilityInputResponse(true);
 	}
 }
 
@@ -159,7 +161,7 @@ bool UTPPAbilitySetManager::IsPrimaryAbilityActive() const
 		return false;
 	}
 
-	const FGameplayAbilitySpec* PrimaryAbilitySpec = CachedAbilitySystem->FindAbilitySpecFromHandle(PrimaryActiveAbility);
+	const FGameplayAbilitySpec* PrimaryAbilitySpec = CachedAbilitySystem->FindAbilitySpecFromHandle(ActivePrimaryAbilityHandle);
 	return PrimaryAbilitySpec ? PrimaryAbilitySpec->IsActive() : false;
 }
 
@@ -170,34 +172,30 @@ bool UTPPAbilitySetManager::IsSecondaryAbilityActive() const
 		return false;
 	}
 
-	const FGameplayAbilitySpec* SecondaryAbilitySpec = CachedAbilitySystem->FindAbilitySpecFromHandle(SecondaryActiveAbility);
+	const FGameplayAbilitySpec* SecondaryAbilitySpec = CachedAbilitySystem->FindAbilitySpecFromHandle(ActiveSecondaryAbilityHandle);
 	return SecondaryAbilitySpec ? SecondaryAbilitySpec->IsActive() : false;
 }
 
 void UTPPAbilitySetManager::SelectNextPrimaryAbility()
 {
 	int32 CurrentPrimaryAbilityIndex = -1;
-	CurrentPrimaryAbilityIndex = PrimaryAbilityHandles.Find(PrimaryActiveAbility);
-	if (CurrentPrimaryAbilityIndex != -1)
+	CurrentPrimaryAbilityIndex = PrimaryAbilityHandles.Find(ActivePrimaryAbilityHandle);
+
+	const int32 NextAbilityIndex = (CurrentPrimaryAbilityIndex + 1) % PrimaryAbilityHandles.Num();
+	if (PrimaryAbilityHandles.IsValidIndex(NextAbilityIndex))
 	{
-		const int32 NextAbilityIndex = (CurrentPrimaryAbilityIndex + 1) % PrimaryAbilityHandles.Num();
-		if (PrimaryAbilityHandles.IsValidIndex(NextAbilityIndex))
-		{
-			SetActivePrimaryAbility(PrimaryAbilityHandles[NextAbilityIndex]);
-		}
+		SetActivePrimaryAbility(PrimaryAbilityHandles[NextAbilityIndex]);
 	}
 }
 
 void UTPPAbilitySetManager::SelectNextSecondaryAbility()
 {
 	int32 CurrentSecondaryAbilityIndex = -1;
-	CurrentSecondaryAbilityIndex = SecondaryAbilityHandles.Find(SecondaryActiveAbility);
-	if (CurrentSecondaryAbilityIndex != -1)
+	CurrentSecondaryAbilityIndex = SecondaryAbilityHandles.Find(ActiveSecondaryAbilityHandle);
+
+	const int32 NextAbilityIndex = (CurrentSecondaryAbilityIndex + 1) % SecondaryAbilityHandles.Num();
+	if (SecondaryAbilityHandles.IsValidIndex(NextAbilityIndex))
 	{
-		const int32 NextAbilityIndex = (CurrentSecondaryAbilityIndex + 1) % SecondaryAbilityHandles.Num();
-		if (SecondaryAbilityHandles.IsValidIndex(NextAbilityIndex))
-		{
-			SetActiveSecondaryAbility(SecondaryAbilityHandles[NextAbilityIndex]);
-		}
+		SetActiveSecondaryAbility(SecondaryAbilityHandles[NextAbilityIndex]);
 	}
 }

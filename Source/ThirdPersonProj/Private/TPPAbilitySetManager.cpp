@@ -142,7 +142,7 @@ void UTPPAbilitySetManager::SetActiveSecondaryAbility(const FGameplayAbilitySpec
 	ActiveSecondaryAbilityHandle = SpecHandle;
 
 	const FGameplayAbilitySpec* SecondaryAbilitySpec = CachedAbilitySystem->FindAbilitySpecFromHandle(SpecHandle);
-	UTPPAbility* TPPAbility = SecondaryAbilitySpec ? Cast<UTPPAbility>(SecondaryAbilitySpec->Ability) : nullptr;
+	UTPPAbility* TPPAbility = SecondaryAbilitySpec ? Cast<UTPPAbility>(SecondaryAbilitySpec->GetPrimaryInstance()) : nullptr;
 	if (TPPAbility)
 	{
 		TPPAbility->OnAbilityEquipped();

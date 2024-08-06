@@ -6,7 +6,7 @@
 #include "Kismet/KismetMathLibrary.h"
 
 
-TArray<FHitResult> UTPPFunctionLibrary::GetAllOverlapsWithinCone(const UObject* WorldContextObject, const FVector& ConeOrigin, const FRotator& ConeRotation, const float ConeLength, const float ConeWidthAngle, const float ConeHeightAngle, const TArray<AActor*>& IgnoreActors, bool bRequireLOS)
+TArray<FHitResult> UTPPFunctionLibrary::GetAllOverlapsWithinCone(const UObject* WorldContextObject, const FVector& ConeOrigin, const FRotator& ConeRotation, const float ConeLength, const float ConeWidthAngle, const float ConeHeightAngle, const TArray<AActor*>& IgnoreActors, bool bRequireLOS, bool bDrawDebug)
 {
 	TArray<FHitResult> OverlapsToReturn;
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
@@ -28,27 +28,25 @@ TArray<FHitResult> UTPPFunctionLibrary::GetAllOverlapsWithinCone(const UObject* 
 	QueryParams.bIgnoreBlocks = true;
 	const FVector SweepPosition = ConeOrigin + (ConeDirection * ConeLength);
 
-	UKismetSystemLibrary::DrawDebugConeInDegrees(World, ConeOrigin, ConeRotation.Vector(), ConeLength, ConeWidthAngle, ConeHeightAngle, 12, FColor::Green, 14.0f, .4f);
-	//DrawDebugSphere(World, SweepPosition, SphereCollision.GetSphereRadius(), 16.0f, FColor::Red, false, 14, 0, .3f);
+	if (bDrawDebug)
+	{
+		UKismetSystemLibrary::DrawDebugConeInDegrees(World, ConeOrigin, ConeRotation.Vector(), ConeLength, ConeWidthAngle, ConeHeightAngle, 12, FColor::Green, 14.0f, .4f);
+		//DrawDebugSphere(World, SweepPosition, SphereCollision.GetSphereRadius(), 16.0f, FColor::Red, false, 14, 0, .3f);
+	}
 	World->SweepMultiByObjectType(OutHits, ConeOrigin, SweepPosition, ConeRotation.Quaternion(), FCollisionObjectQueryParams::AllDynamicObjects, SphereCollision, QueryParams);
 
 	if (bRequireLOS)
 	{
-		TArray<AActor*> OverlappedActors;
-		// Get all overlapped actors for LOS check. Maybe there's a better way to do this?
-		for (const FHitResult& HitResult : OutHits)
-		{
-			OverlappedActors.Add(HitResult.GetActor());
-		}
-
 		QueryParams.bIgnoreBlocks = false;
-		QueryParams.AddIgnoredActors(OverlappedActors);
 	}
 
 	for (const FHitResult& HitResult : OutHits)
 	{
 		const FVector OriginToHitLocation = HitResult.GetActor()->GetActorLocation() - ConeOrigin;
-		DrawDebugLine(World, ConeOrigin, HitResult.ImpactPoint, FColor::Yellow, false, 14, 0, .4f);
+		if (bDrawDebug)
+		{
+			DrawDebugLine(World, ConeOrigin, HitResult.ImpactPoint, FColor::Yellow, false, 14, 0, .4f);
+		}
 		if (OriginToHitLocation.SizeSquared() >= LengthSqr)
 		{
 			continue;

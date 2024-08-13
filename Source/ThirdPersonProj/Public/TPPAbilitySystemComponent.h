@@ -41,6 +41,12 @@ public:
 	bool IsSecondaryAbilityInputBlocked() const;
 
 	UFUNCTION(BlueprintCallable)
+	void BlockJumpAbilityInput();
+
+	UFUNCTION(BlueprintCallable)
+	void UnblockJumpAbilityInput();
+
+	UFUNCTION(BlueprintCallable)
 	void CancelAbilitiesByTag(const FGameplayTagContainer& TagContainer);
 
 protected:

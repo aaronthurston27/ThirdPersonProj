@@ -16,7 +16,7 @@ class THIRDPERSONPROJ_API UTPPAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
 
-	UTPPAbility();
+protected:
 
 	/** Called when the ability is given to an AbilitySystemComponent */
 	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
@@ -24,6 +24,8 @@ class THIRDPERSONPROJ_API UTPPAbility : public UGameplayAbility
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
 public:
+
+	UTPPAbility();
 
 	void SetAbilityInputResponse(bool bShouldRespondToInput = false);
 

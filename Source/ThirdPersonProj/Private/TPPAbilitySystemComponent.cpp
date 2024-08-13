@@ -2,6 +2,7 @@
 
 
 #include "TPPAbilitySystemComponent.h"
+#include "GameplayAbilitySet.h"
 #include "ThirdPersonProj/ThirdPersonProjCharacter.h"
 
 void UTPPAbilitySystemComponent::BeginPlay()
@@ -45,6 +46,16 @@ void UTPPAbilitySystemComponent::UnblockSecondaryAbilityInput()
 bool UTPPAbilitySystemComponent::IsSecondaryAbilityInputBlocked() const
 {
 	return IsAbilityInputBlocked(1);
+}
+
+void UTPPAbilitySystemComponent::BlockJumpAbilityInput()
+{
+	BlockAbilityByInputID((int32)EGameplayAbilityInputBinds::Ability7);
+}
+
+void UTPPAbilitySystemComponent::UnblockJumpAbilityInput()
+{
+	UnBlockAbilityByInputID((int32)EGameplayAbilityInputBinds::Ability7);
 }
 
 void UTPPAbilitySystemComponent::CancelAbilitiesByTag(const FGameplayTagContainer& TagContainer)

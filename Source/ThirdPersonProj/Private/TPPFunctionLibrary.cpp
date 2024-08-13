@@ -63,7 +63,7 @@ TArray<FHitResult> UTPPFunctionLibrary::GetAllOverlapsWithinCone(const UObject* 
 		if (bRequireLOS)
 		{
 			FHitResult LOSHitResult;
-			World->LineTraceSingleByChannel(LOSHitResult, ConeOrigin, HitResult.ImpactPoint, ECollisionChannel::ECC_WorldStatic, QueryParams, FCollisionResponseParams::DefaultResponseParam);
+			World->LineTraceSingleByObjectType(LOSHitResult, ConeOrigin, HitResult.ImpactPoint, FCollisionObjectQueryParams::AllStaticObjects, QueryParams);
 			if (LOSHitResult.bBlockingHit)
 			{
 				continue;

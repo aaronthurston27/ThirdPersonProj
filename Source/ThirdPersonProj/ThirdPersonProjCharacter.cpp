@@ -85,8 +85,11 @@ void AThirdPersonProjCharacter::BeginPlay()
 	if (TPPAbilitySystemComponent)
 	{
 		const FTopLevelAssetPath InputEnumPath = FTopLevelAssetPath(TEXT("/Script/GameplayAbilities"), TEXT("EGameplayAbilityInputBinds"));
-		FGameplayAbilityInputBinds Binds(TEXT("Confirm"), TEXT("Cancel"), InputEnumPath);
+		const FGameplayAbilityInputBinds Binds(TEXT("Confirm"), TEXT("Cancel"), InputEnumPath, 0 ,1);
 		TPPAbilitySystemComponent->BindAbilityActivationToInputComponent(InputComponent, Binds);
+
+		// Call this on begin play so that the controller pointer is set in the actor info struct.
+		TPPAbilitySystemComponent->RefreshAbilityActorInfo();
 	}
 }
 

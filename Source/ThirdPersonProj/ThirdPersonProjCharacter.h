@@ -102,7 +102,6 @@ protected:
 
 	void OnCycleSecondaryAbilityPressed(const FInputActionValue& Value);
 			
-
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

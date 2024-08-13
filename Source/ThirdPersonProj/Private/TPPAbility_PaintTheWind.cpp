@@ -35,7 +35,7 @@ void UTPPAbility_PaintTheWind::UpdateWindPath(float DeltaTime)
 
 	const FVector TargetPathPoint = CurrentPathLocation + (CurrentPathDirection * PathDrawingSpeed * DeltaTime);
 	const float LastSplinePoint = WindPathActor->PathSpline->GetSplineLength();
-	const FVector PreviousPathPoint = WindPathActor->PathSpline->GetSplinePointAt(LastSplinePoint, ESplineCoordinateSpace::World).Position;
+	const FVector PreviousPathPoint = WindPathActor->PathSpline->GetLocationAtSplinePoint(LastSplinePoint, ESplineCoordinateSpace::World);
 
 	FHitResult HitResult;
 	GetWorld()->LineTraceSingleByObjectType(HitResult, PreviousPathPoint, TargetPathPoint, FCollisionObjectQueryParams::AllStaticObjects);
@@ -44,8 +44,9 @@ void UTPPAbility_PaintTheWind::UpdateWindPath(float DeltaTime)
 	const float NewSplineIndex = LastSplinePoint + 1;
 	if (!HitResult.bBlockingHit || HitResult.Distance > 3.0f)
 	{
-		WindPathActor->PathSpline->AddPoint(FSplinePoint(NewSplineIndex, NewPoint, ESplinePointType::Constant, CurrentPathDirection.Rotation()));
-		DrawDebugSphere(GetWorld(), WindPathActor->PathSpline->GetSplinePointAt(NewSplineIndex, ESplineCoordinateSpace::World).Position, 25.0f, 4, FColor::Green, false, 8.0f, 0, .4f);
+		WindPathActor->PathSpline->AddSplinePoint(NewPoint, ESplineCoordinateSpace::World);
+		WindPathActor->PathSpline->SetTangentAtSplinePoint(NewSplineIndex, CurrentPathDirection, ESplineCoordinateSpace::World);
+		DrawDebugSphere(GetWorld(), WindPathActor->PathSpline->GetLocationAtSplinePoint(NewSplineIndex, ESplineCoordinateSpace::World), 25.0f, 4, FColor::Green, false, 8.0f, 0, .4f);
 
 		CurrentPathLocation = NewPoint;
 		const FVector PointToCenter = NewPoint - PathCenterPoint;
@@ -92,8 +93,8 @@ void UTPPAbility_PaintTheWind::CreateWindPath(const FVector& WindPathStartingPoi
 	bPathCenterPointReached = false;
 
 	WindPathActor->PathSpline->ClearSplinePoints();
-	FSplinePoint SplinePoint(0, CurrentPathLocation, ESplinePointType::Constant, CurrentPathDirection.ToOrientationRotator());
-	WindPathActor->PathSpline->AddPoint(SplinePoint);
+	WindPathActor->PathSpline->AddSplinePoint(CurrentPathLocation, ESplineCoordinateSpace::World);
+		
 }
 
 void UTPPAbility_PaintTheWind::SetWantsToCurvePath(bool bNewWantsToCurvePath)
@@ -141,6 +142,7 @@ void UTPPAbility_PaintTheWind::OnWindPathCompleted_Implementation()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Path completed"));
 	CurrentPathDirection = FVector::ZeroVector;
+	WindPathActor->OnWindPathCompleted();
 	EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, false);
 }
 

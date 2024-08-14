@@ -34,7 +34,7 @@ void UTPPAbility_PaintTheWind::UpdateWindPath(float DeltaTime)
 	AdjustWindDirection(DeltaTime);
 
 	const FVector TargetPathPoint = CurrentPathLocation + (CurrentPathDirection * PathDrawingSpeed * DeltaTime);
-	const float LastSplinePoint = WindPathActor->PathSpline->GetSplineLength();
+	const float LastSplinePoint = WindPathActor->PathSpline->GetNumberOfSplinePoints() - 1;
 	const FVector PreviousPathPoint = WindPathActor->PathSpline->GetLocationAtSplinePoint(LastSplinePoint, ESplineCoordinateSpace::World);
 
 	FHitResult HitResult;
@@ -54,6 +54,9 @@ void UTPPAbility_PaintTheWind::UpdateWindPath(float DeltaTime)
 			if (PointCenter_DirectionDot > 0.0f)
 			{
 				bPathCenterPointReached = true;
+
+				const FVector CenterToPlayerVec_Normal2D = (PathCenterPoint - CachedCharacterOwner->GetActorLocation()).GetSafeNormal2D();
+				const float PlayerToCenter_Direction_Dot = CenterToPlayerVec_Normal2D | OriginalPathDirection.GetSafeNormal2D();
 			}
 		}
 		
@@ -91,7 +94,7 @@ void UTPPAbility_PaintTheWind::CreateWindPath(const FVector& WindPathStartingPoi
 	bPathCenterPointReached = false;
 
 	WindPathActor->PathSpline->ClearSplinePoints();
-	WindPathActor->PathSpline->AddSplinePoint(CurrentPathLocation, ESplineCoordinateSpace::World);
+	WindPathActor->AddPointToSplinePath(CurrentPathLocation, CurrentPathDirection);
 		
 }
 
@@ -104,23 +107,10 @@ void UTPPAbility_PaintTheWind::AdjustWindDirection(float DeltaTime)
 {
 	if (bWantsToCurveWindPath && bPathCenterPointReached)
 	{
-		FVector PlayerViewPoint;
-		FRotator Rot;
-		CachedCharacterOwner->GetController()->GetPlayerViewPoint(PlayerViewPoint, Rot);
-
-		const FVector PlayerAimVector = Rot.Vector();
-		const FVector CenterToPlayerAimVector = (PathCenterPoint - PlayerViewPoint);
-		const FRotator RotationDelta = (PlayerAimVector.Rotation() - CenterToPlayerAimVector.Rotation()) * LookInputPathControlScalar;
-		//UE_LOG(LogTemp, Warning, TEXT("Rotation delta: %s, Scalar: %s"), *RotationDelta.ToString(), *(RotationDelta * LookInputPathControlScalar).ToString());
-
-		const FRotator OriginalRotation = OriginalPathDirection.Rotation();
-		FRotator TargetRotation = OriginalRotation + RotationDelta;
-
-		TargetRotation.Pitch = FMath::Clamp(TargetRotation.Pitch, OriginalRotation.Pitch - 90.0f, OriginalRotation.Pitch + 90.0f);
-		TargetRotation.Yaw = FMath::Clamp(TargetRotation.Yaw, OriginalRotation.Yaw - 90.0f, OriginalRotation.Yaw + 90.0f);
-		//UE_LOG(LogTemp, Warning, TEXT("Target Rotation: %s, Original: %s"), *TargetRotation.ToString(), *(OriginalRotation).ToString());
+		const FRotator TargetRotation = GetTargetWindDirection().ToOrientationRotator();
 
 		FRotator DeltaToApply = TargetRotation - CurrentPathDirection.Rotation();
+		DeltaToApply.Normalize();
 		DeltaToApply.Pitch = FMath::Clamp(DeltaToApply.Pitch, -DeltaTime * PathRotationSpeed.Pitch, DeltaTime * PathRotationSpeed.Pitch);
 		DeltaToApply.Yaw = FMath::Clamp(DeltaToApply.Yaw, -DeltaTime * PathRotationSpeed.Yaw, DeltaTime * PathRotationSpeed.Yaw);
 
@@ -128,8 +118,44 @@ void UTPPAbility_PaintTheWind::AdjustWindDirection(float DeltaTime)
 		DirectionRot.Normalize();
 
 		CurrentPathDirection = DirectionRot.Vector();
-		//UE_LOG(LogTemp, Warning, TEXT("DeltaToApply: %s, Direction: %s"), *DeltaToApply.ToString(), *CurrentPathDirection.ToString());
 	}
+}
+
+FVector UTPPAbility_PaintTheWind::GetTargetWindDirection() const
+{
+	if (bPathCenterPointReached && bWantsToCurveWindPath)
+	{
+		const FVector CenterToOwner_Vec = (PathCenterPoint - CachedCharacterOwner->GetActorLocation()).GetSafeNormal2D();
+		const float WindDirection_PathToCenterDot = FMath::RoundToFloat(OriginalPathDirection | CenterToOwner_Vec);
+		const FVector2D RawInputVector = CachedCharacterOwner->GetLastRawInputVector();
+		FVector InputVec = FVector(0.0f, RawInputVector.Y, RawInputVector.X).GetSafeNormal();
+		if (InputVec.IsNearlyZero())
+		{
+			InputVec = FVector::ForwardVector;
+		}
+
+		// If wind path is travelling parallel to the player's look vector, horizontal (y axis) key input should curve the path to the players right or left.
+		// Else, if the wind path is travelling perpindicular, curve left/right relative to the wind path.
+		if (FMath::Abs(WindDirection_PathToCenterDot) > .8f)
+		{
+			if (FMath::Abs(InputVec.Z) == 1.0f)
+			{
+				// If only pitching up, don't move past the max pitch. Don't move at 90 degrees to avoid gimbal lock.
+				InputVec = FVector(FMath::Sign(WindDirection_PathToCenterDot), 0.0f, InputVec.Z * FMath::Asin(FMath::DegreesToRadians(MaxPathPitch))).GetSafeNormal();
+			}
+			return CenterToOwner_Vec.Rotation().RotateVector(InputVec);
+		}
+
+		if (FMath::Abs(InputVec.Z) == 1.0f)
+		{
+			// If only pitching up, don't move past the max pitch. Don't move at 90 degrees to avoid gimbal lock.
+			InputVec = FVector(1.0f, 0.0f, InputVec.Z * FMath::Asin(FMath::DegreesToRadians(MaxPathPitch))).GetSafeNormal();
+		}
+
+		return OriginalPathDirection.Rotation().RotateVector(InputVec);
+	}
+
+	return CurrentPathDirection;
 }
 
 void UTPPAbility_PaintTheWind::OnWindPathActorCreated_Implementation()

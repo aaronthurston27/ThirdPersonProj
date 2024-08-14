@@ -28,28 +28,31 @@ void AAbilityActor_WindPath::BeginPlay()
 void AAbilityActor_WindPath::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	TickWindCollisionPhysics(DeltaTime);
 }
 
 void AAbilityActor_WindPath::AddPointToSplinePath(const FVector& WorldLocation, const FVector& Direction)
 {
 	PathSpline->AddSplinePoint(WorldLocation, ESplineCoordinateSpace::World);
-	PathSpline->SetTangentAtSplinePoint(PathSpline->GetSplineLength(), Direction, ESplineCoordinateSpace::World);
+	PathSpline->SetTangentAtSplinePoint(PathSpline->GetNumberOfSplinePoints() - 1, Direction, ESplineCoordinateSpace::World);
 
 	//DrawDebugSphere(GetWorld(), WindPathActor->PathSpline->GetLocationAtSplinePoint(NewSplineIndex, ESplineCoordinateSpace::World), 25.0f, 4, FColor::Green, false, 8.0f, 0, .4f);
 
-	OnSplinePointAdded(PathSpline->GetSplineLength());
+	OnSplinePointAdded(PathSpline->GetNumberOfSplinePoints() - 1);
 }
 
 void AAbilityActor_WindPath::OnSplinePointAdded_Implementation(int32 SplineIndex)
 {
-	if (SplineIndex - PreviousSplineCollisionMeshIndex >= WindCollisionSplinePointLength)
+	if (SplineIndex - PreviousSplineCollisionMeshIndex >= WindCollisionSplinePointLength || SplineIndex == 0)
 	{
-		SpawnCollisionVolumeBetweenSplinePoints();
+		SpawnCollisionVolumeAtCurrentSplinePoint();
 	}
 }
 
 void AAbilityActor_WindPath::OnWindPathCompleted_Implementation()
 {
+	bIsWindPathComplete = true;
 	GetWorldTimerManager().SetTimer(WindPathTimerHandle, this, &AAbilityActor_WindPath::OnWindPathDurationExpired, WindPathDuration, false);
 }
 
@@ -58,15 +61,11 @@ void AAbilityActor_WindPath::OnWindPathDurationExpired_Implementation()
 	SetLifeSpan(WindPathExpiredDuration);
 }
 
-void AAbilityActor_WindPath::SpawnCollisionVolumeBetweenSplinePoints()
+void AAbilityActor_WindPath::SpawnCollisionVolumeAtCurrentSplinePoint()
 {
-	int32 CurrentIndex = PathSpline->GetSplineLength();
-	ensure(CurrentIndex != PreviousSplineCollisionMeshIndex);
+	int32 CurrentIndex = PathSpline->GetNumberOfSplinePoints() - 1;
 
-	const FVector FirstLocation = PathSpline->GetLocationAtSplinePoint(PreviousSplineCollisionMeshIndex, ESplineCoordinateSpace::World);
-	const FVector SecondLocation = PathSpline->GetLocationAtSplinePoint(CurrentIndex, ESplineCoordinateSpace::World);
-
-	const FVector CenterPoint = (FirstLocation + SecondLocation) * .5f;
+	const FVector CurrentLocation = PathSpline->GetLocationAtSplinePoint(CurrentIndex, ESplineCoordinateSpace::World);
 	const FVector TangentDir = PathSpline->GetTangentAtSplinePoint(CurrentIndex, ESplineCoordinateSpace::World).GetSafeNormal();
 	const FRotator MeshRotation = UKismetMathLibrary::MakeRotFromZ(TangentDir);
 
@@ -77,12 +76,95 @@ void AAbilityActor_WindPath::SpawnCollisionVolumeBetweenSplinePoints()
 		CollisionStaticMeshSubobject->AttachToComponent(PathSpline, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		FinishAddComponent(CollisionStaticMeshSubobject, true, FTransform::Identity);
 
-		CollisionStaticMeshSubobject->SetWorldLocationAndRotation(CenterPoint, MeshRotation, false);
+		// Add collision events before enabling collision so that updates are correctly called.
+		CollisionStaticMeshSubobject->OnComponentBeginOverlap.AddDynamic(this, &AAbilityActor_WindPath::OnWindMeshCollisionOverlapBegin);
+		CollisionStaticMeshSubobject->OnComponentEndOverlap.AddDynamic(this, &AAbilityActor_WindPath::OnWindMeshCollisionOverlapEnd);
+
+		CollisionStaticMeshSubobject->SetWorldLocationAndRotation(CurrentLocation, MeshRotation, false);
 		CollisionStaticMeshSubobject->SetWorldScale3D(WindCollisionStaticMeshScale);
 		CollisionStaticMeshSubobject->SetStaticMesh(CollisionStaticMesh);
-		CollisionStaticMeshSubobject->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		CollisionStaticMeshSubobject->SetCollisionProfileName(FName(TEXT("OverlapAllDynamic")));
+
+		WindCollisionMeshes.Add(CollisionStaticMeshSubobject);
 	}
 
 	PreviousSplineCollisionMeshIndex = CurrentIndex;
+}
+
+void AAbilityActor_WindPath::OnWindMeshCollisionOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor && !OtherActor->IsA<APawn>() && OtherActor != this && !OtherActor->IsA<AAbilityActor_WindPath>())
+	{
+		if (OverlappedActors.Contains(OtherActor))
+		{
+			OverlappedActors[OtherActor]++;
+		}
+		else
+		{
+			OverlappedActors.Add(OtherActor, 1);
+		}
+	}
+}
+
+void AAbilityActor_WindPath::OnWindMeshCollisionOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OverlappedActors.Contains(OtherActor))
+	{
+		--OverlappedActors[OtherActor];
+		if (OverlappedActors[OtherActor] == 0)
+		{
+			OverlappedActors.Remove(OtherActor);
+		}
+	}
+}
+
+void AAbilityActor_WindPath::TickWindCollisionPhysics(float DeltaTime)
+{
+	for (auto& ActorKVP: OverlappedActors)
+	{
+		if (ActorKVP.Key)
+		{
+			const FVector ClosestPointOnSpline = PathSpline->FindLocationClosestToWorldLocation(ActorKVP.Key->GetActorLocation(), ESplineCoordinateSpace::World);
+
+			FHitResult LOSHitResult;
+			GetWorld()->LineTraceSingleByObjectType(LOSHitResult, ActorKVP.Key->GetActorLocation(), ClosestPointOnSpline, FCollisionObjectQueryParams::AllStaticObjects);
+			if (!LOSHitResult.bBlockingHit)
+			{
+				ApplyWindForceToObject(DeltaTime, ActorKVP.Key, ClosestPointOnSpline);
+			}
+		}
+	}
+}
+
+void AAbilityActor_WindPath::ApplyWindForceToObject(float DeltaTime, AActor* Actor, const FVector& ClosestPointToSpline)
+{
+	UMeshComponent* MeshComp = Actor->GetComponentByClass<UMeshComponent>();
+	if (MeshComp && MeshComp->IsSimulatingPhysics())
+	{
+		//DrawDebugLine(GetWorld(), Actor->GetActorLocation(), ClosestPointToSpline, FColor::Green, false, 2.0f, 0, .4f);
+
+		const FVector ForceTowardSplineVec = PathSpline->FindLocationClosestToWorldLocation(Actor->GetActorLocation(), ESplineCoordinateSpace::World) - Actor->GetActorLocation();
+		const float DistanceFromPath = ForceTowardSplineVec.Size();
+		const float WindPathDistanceRatio = FMath::Min(MaxDistanceFromWindPath, DistanceFromPath) / MaxDistanceFromWindPath;
+
+		float ForceMagnitudeTowardInnerPath = WindForceTowardsPath * WindPathDistanceRatio;
+		if (bIsWindPathComplete)
+		{
+			const int32 SplineIndex = PathSpline->FindInputKeyClosestToWorldLocation(Actor->GetActorLocation());
+			const float EndPathRatio = SplineIndex >= PathSpline->GetNumberOfSplinePoints() - EndPathSplinePointIndexThreshold ? .25f : 1.0f;
+			ForceMagnitudeTowardInnerPath *= EndPathRatio;
+		}
+		// UE_LOG(LogTemp, Warning, TEXT("Force along path: %f, Ratio: %f"), ForceMagnitudeTowardInnerPath, WindPathDistanceRatio);
+		MeshComp->AddImpulse(ForceTowardSplineVec.GetSafeNormal() * ForceMagnitudeTowardInnerPath * DeltaTime, NAME_None, false);
+
+		const FVector WindDirectionAtSplinePoint = PathSpline->FindTangentClosestToWorldLocation(ClosestPointToSpline, ESplineCoordinateSpace::World).GetSafeNormal();
+		const float DistanceFromInnerWindPath = ForceTowardSplineVec.Size();
+		float WindForce = WindForceAlongPath * FMath::Max(.2f, 1.0f - WindPathDistanceRatio);
+		float GravityDot = FMath::Max(WindDirectionAtSplinePoint | FVector::UpVector, 0.0f);
+		const FVector GravityForce = FVector::UpVector * GravityDot * GravityForce;
+		// DrawDebugLine(GetWorld(), Actor->GetActorLocation(), Actor->GetActorLocation() + WindDirectionAtSplinePoint * 165.0f, FColor::Yellow, false, 5.0f, 0, .8f);
+		MeshComp->AddImpulse((GravityForce + (WindDirectionAtSplinePoint * WindForce)) * DeltaTime, NAME_None, false);
+
+	}
 }
 

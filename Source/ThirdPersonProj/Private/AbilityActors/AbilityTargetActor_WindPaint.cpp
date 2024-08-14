@@ -83,7 +83,10 @@ FHitResult AAbilityTargetActor_WindPaint::PerformTrace(AActor* InSourceActor)
 		if (IntermediateHitResult.Time < .6f)
 		{
 			bWasLastTraceValid = false;
-			DrawDebugSphere(InSourceActor->GetWorld(), IntermediateHitResult.Location, 60.0f, 6, FColor::Red, false, .8f, 0, .3f);
+			if (bDebug)
+			{
+				DrawDebugSphere(InSourceActor->GetWorld(), IntermediateHitResult.Location, 60.0f, 6, FColor::Red, false, .8f, 0, .3f);
+			}
 			return ReturnHitResult;
 		}
 
@@ -97,8 +100,11 @@ FHitResult AAbilityTargetActor_WindPaint::PerformTrace(AActor* InSourceActor)
 		bWasLastTraceValid = false;
 	}
 
-	DrawDebugSphere(InSourceActor->GetWorld(), ReturnHitResult.TraceStart, 60.0f, 6, FColor::Green, false, .8f, 0, .3f);
-	
+	if (bDebug)
+	{
+		DrawDebugSphere(InSourceActor->GetWorld(), ReturnHitResult.TraceStart, 60.0f, 6, FColor::Green, false, .8f, 0, .3f);
+	}
+
 	bWasLastTraceValid = true;
 	return ReturnHitResult;
 }

@@ -49,11 +49,45 @@ protected:
 	UPROPERTY(Transient)
 	FTimerHandle WindPathTimerHandle;
 
+	UPROPERTY(Transient)
+	bool bIsWindPathComplete = false;
+
 	UFUNCTION(BlueprintNativeEvent)
 	void OnWindPathDurationExpired();
 	void OnWindPathDurationExpired_Implementation();
 
-	void SpawnCollisionVolumeBetweenSplinePoints();
+	void SpawnCollisionVolumeAtCurrentSplinePoint();
+
+	UPROPERTY(Transient)
+	TArray<UStaticMeshComponent*> WindCollisionMeshes;
+
+	UPROPERTY(Transient)
+	TMap<AActor*, int32> OverlappedActors;
+
+	UFUNCTION()
+	void OnWindMeshCollisionOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnWindMeshCollisionOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Wind Force", meta = (UIMin = "1.0", ClampMin = "1.0"))
+	float WindForceTowardsPath = 4000.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Wind Force", meta = (UIMin = "1.0", ClampMin = "1.0"))
+	float WindForceAlongPath = 4000.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Wind Force")
+	float MaxDistanceFromWindPath = 200.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Wind Force")
+	int32 EndPathSplinePointIndexThreshold = 6;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Wind Force")
+	float GravityForceMultiplier = 5000.0f;
+
+	void TickWindCollisionPhysics(float DeltaTime);
+
+	void ApplyWindForceToObject(float DeltaTime, AActor* Actor, const FVector& ClosestPointToSpline);
 
 public:	
 	// Called every frame

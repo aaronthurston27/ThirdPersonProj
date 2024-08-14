@@ -52,8 +52,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, meta = (UIMax = "1.0", ClampMax = "1.0", UIMin = "0", ClampMin = "0"))
 	float LookInputPathControlScalar = .45f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FVector CharacterOffset = FVector::ZeroVector;
+	UPROPERTY(EditDefaultsOnly, meta = (UIMax = "89.0", ClampMax = "89.0", UIMin = "0", ClampMin = "0"))
+	float MaxPathPitch = 90.0f;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AAbilityActor_WindPath> WindPathClass;
@@ -89,6 +89,8 @@ protected:
 	void SetWantsToCurvePath(bool bWantsToCurvePath);
 
 	void AdjustWindDirection(float DeltaTime);
+
+	FVector GetTargetWindDirection() const;
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnWindPathActorCreated();

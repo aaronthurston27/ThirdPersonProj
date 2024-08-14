@@ -44,9 +44,7 @@ void UTPPAbility_PaintTheWind::UpdateWindPath(float DeltaTime)
 	const float NewSplineIndex = LastSplinePoint + 1;
 	if (!HitResult.bBlockingHit || HitResult.Distance > 3.0f)
 	{
-		WindPathActor->PathSpline->AddSplinePoint(NewPoint, ESplineCoordinateSpace::World);
-		WindPathActor->PathSpline->SetTangentAtSplinePoint(NewSplineIndex, CurrentPathDirection, ESplineCoordinateSpace::World);
-		DrawDebugSphere(GetWorld(), WindPathActor->PathSpline->GetLocationAtSplinePoint(NewSplineIndex, ESplineCoordinateSpace::World), 25.0f, 4, FColor::Green, false, 8.0f, 0, .4f);
+		WindPathActor->AddPointToSplinePath(NewPoint, CurrentPathDirection);
 
 		CurrentPathLocation = NewPoint;
 		const FVector PointToCenter = NewPoint - PathCenterPoint;

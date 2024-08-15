@@ -49,9 +49,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FRotator PathRotationSpeed = FRotator(30.0f, 30.0f, 0.0f);
 
-	UPROPERTY(EditDefaultsOnly, meta = (UIMax = "1.0", ClampMax = "1.0", UIMin = "0", ClampMin = "0"))
-	float LookInputPathControlScalar = .45f;
-
 	UPROPERTY(EditDefaultsOnly, meta = (UIMax = "89.0", ClampMax = "89.0", UIMin = "0", ClampMin = "0"))
 	float MaxPathPitch = 90.0f;
 

@@ -4,6 +4,7 @@
 #include "TPPAbility_PaintTheWind.h"
 #include "AbilityActors/AbilityActor_WindPath.h"
 #include "ThirdPersonProj/ThirdPersonProjCharacter.h"
+#include "TPPAbilitySystemComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 void UTPPAbility_PaintTheWind::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -99,7 +100,8 @@ void UTPPAbility_PaintTheWind::CreateWindPath(const FVector& WindPathStartingPoi
 
 	WindPathActor->PathSpline->ClearSplinePoints();
 	WindPathActor->AddPointToSplinePath(CurrentPathLocation, CurrentPathDirection);
-		
+
+	OnWindPathActorCreated();
 }
 
 void UTPPAbility_PaintTheWind::SetWantsToCurvePath(bool bNewWantsToCurvePath)
@@ -164,13 +166,25 @@ FVector UTPPAbility_PaintTheWind::GetTargetWindDirection() const
 
 void UTPPAbility_PaintTheWind::OnWindPathActorCreated_Implementation()
 {
+	UTPPAbilitySystemComponent* TPP_AbilitySystem = Cast<UTPPAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());
+	if (TPP_AbilitySystem)
+	{
+		TPP_AbilitySystem->BlockPrimaryAbilityInput();
+	}
 }
 
 void UTPPAbility_PaintTheWind::OnWindPathCompleted_Implementation()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Path completed"));
-	CurrentPathDirection = FVector::ZeroVector;
+
 	WindPathActor->OnWindPathCompleted();
+
+	UTPPAbilitySystemComponent* TPP_AbilitySystem = Cast<UTPPAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());
+	if (TPP_AbilitySystem)
+	{
+		TPP_AbilitySystem->UnblockPrimaryAbilityInput();
+	}
+
 	EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, false);
 }
 

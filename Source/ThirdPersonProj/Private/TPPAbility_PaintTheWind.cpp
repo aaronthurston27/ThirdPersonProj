@@ -9,12 +9,6 @@
 void UTPPAbility_PaintTheWind::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	// Destroy the old wind path.
-	if (WindPathActor)
-	{
-		WindPathActor->Destroy();
-	}
 }
 
 void UTPPAbility_PaintTheWind::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
@@ -82,6 +76,12 @@ void UTPPAbility_PaintTheWind::UpdateWindPath(float DeltaTime)
 
 void UTPPAbility_PaintTheWind::CreateWindPath(const FVector& WindPathStartingPoint, const FVector& WindPathCenterPoint, const FRotator& Rotation)
 {
+	// Destroy the old wind path.
+	if (WindPathActor)
+	{
+		WindPathActor->Destroy();
+	}
+
 	FTransform SpawnTransform(Rotation, WindPathStartingPoint);
 	FActorSpawnParameters SpawnParams;
 	WindPathActor = GetWorld()->SpawnActor<AAbilityActor_WindPath>(WindPathClass.Get(), SpawnTransform);

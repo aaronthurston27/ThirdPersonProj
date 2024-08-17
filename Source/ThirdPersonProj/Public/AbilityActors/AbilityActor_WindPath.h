@@ -80,9 +80,6 @@ protected:
 	float MaxDistanceFromWindPath = 200.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Wind Force")
-	int32 EndPathSplinePointIndexThreshold = 6;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Wind Force")
 	float GravityForceMultiplier = 5000.0f;
 
 	void TickWindCollisionPhysics(float DeltaTime);

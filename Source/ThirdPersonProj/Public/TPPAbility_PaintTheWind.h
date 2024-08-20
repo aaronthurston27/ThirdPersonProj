@@ -73,17 +73,11 @@ protected:
 	UPROPERTY(Transient)
 	bool bPathCenterPointReached = false;
 
-	UPROPERTY(Transient)
-	bool bWantsToCurveWindPath = false;
-
 	UFUNCTION(BlueprintCallable)
 	void UpdateWindPath(float DeltaTime);
 
 	UFUNCTION(BlueprintCallable)
 	void CreateWindPath(const FVector& WindPathStartingPoint, const FVector& WindPathCenterPoint, const FRotator& Rotation);
-
-	UFUNCTION(BlueprintCallable)
-	void SetWantsToCurvePath(bool bWantsToCurvePath);
 
 	void AdjustWindDirection(float DeltaTime);
 

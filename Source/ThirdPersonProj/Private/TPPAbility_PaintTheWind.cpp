@@ -61,8 +61,8 @@ void UTPPAbility_PaintTheWind::UpdateWindPath(float DeltaTime)
 		
 		if (bPathCenterPointReached)
 		{
-			const float DistanceFromCenter = PointToCenter.Size();
-			if (DistanceFromCenter >= MaxLengthFromCenterPoint)
+			const float DistanceFromCenter = PointToCenter.SizeSquared();
+			if (DistanceFromCenter >= (MaxLengthFromCenterPoint * MaxLengthFromCenterPoint))
 			{
 				OnWindPathCompleted();
 			}
@@ -83,7 +83,7 @@ void UTPPAbility_PaintTheWind::CreateWindPath(const FVector& WindPathStartingPoi
 		WindPathActor->Destroy();
 	}
 
-	FTransform SpawnTransform(Rotation, WindPathStartingPoint);
+	const FTransform SpawnTransform(Rotation, WindPathStartingPoint);
 	FActorSpawnParameters SpawnParams;
 	WindPathActor = GetWorld()->SpawnActor<AAbilityActor_WindPath>(WindPathClass.Get(), SpawnTransform);
 
@@ -104,11 +104,6 @@ void UTPPAbility_PaintTheWind::CreateWindPath(const FVector& WindPathStartingPoi
 	OnWindPathActorCreated();
 }
 
-void UTPPAbility_PaintTheWind::SetWantsToCurvePath(bool bNewWantsToCurvePath)
-{
-	bWantsToCurveWindPath = bNewWantsToCurvePath;
-}
-
 void UTPPAbility_PaintTheWind::AdjustWindDirection(float DeltaTime)
 {
 	const FRotator TargetRotation = GetTargetWindDirection().ToOrientationRotator();
@@ -126,39 +121,36 @@ void UTPPAbility_PaintTheWind::AdjustWindDirection(float DeltaTime)
 
 FVector UTPPAbility_PaintTheWind::GetTargetWindDirection() const
 {
-	if (bPathCenterPointReached)
+	const FVector2D RawInputVector = CachedCharacterOwner->GetLastRawInputVector();
+	if (bPathCenterPointReached && !RawInputVector.IsNearlyZero())
 	{
-		const FVector2D RawInputVector = CachedCharacterOwner->GetLastRawInputVector();
-		if (!RawInputVector.IsNearlyZero())
+		const FVector CenterToOwner_Vec = (PathCenterPoint - CachedCharacterOwner->GetActorLocation()).GetSafeNormal2D();
+		const float WindDirection_PathToCenterDot = FMath::RoundToFloat(OriginalPathDirection | CenterToOwner_Vec);
+		FVector LocalSpaceVector_ToRotate = FVector(0.0f, RawInputVector.Y, RawInputVector.X).GetSafeNormal();
+		if (LocalSpaceVector_ToRotate.IsNearlyZero())
 		{
-			const FVector CenterToOwner_Vec = (PathCenterPoint - CachedCharacterOwner->GetActorLocation()).GetSafeNormal2D();
-			const float WindDirection_PathToCenterDot = FMath::RoundToFloat(OriginalPathDirection | CenterToOwner_Vec);
-			FVector LocalSpaceVector_ToRotate = FVector(0.0f, RawInputVector.Y, RawInputVector.X).GetSafeNormal();
-			if (LocalSpaceVector_ToRotate.IsNearlyZero())
-			{
-				LocalSpaceVector_ToRotate = FVector::ForwardVector;
-			}
+			LocalSpaceVector_ToRotate = FVector::ForwardVector;
+		}
 
-			// If wind path is travelling parallel to the player's look vector, horizontal (y axis) key input should curve the path to the players right or left.
-			// Else, if the wind path is travelling perpindicular, curve left/right relative to the wind path.
-			if (FMath::Abs(WindDirection_PathToCenterDot) > .8f)
-			{
-				if (FMath::Abs(LocalSpaceVector_ToRotate.Z) == 1.0f)
-				{
-					// If only pitching up, don't move past the max pitch. Don't move at 90 degrees to avoid gimbal lock.
-					LocalSpaceVector_ToRotate = FVector(FMath::Sign(WindDirection_PathToCenterDot), 0.0f, LocalSpaceVector_ToRotate.Z * FMath::Asin(FMath::DegreesToRadians(MaxPathPitch))).GetSafeNormal();
-				}
-				return CenterToOwner_Vec.Rotation().RotateVector(LocalSpaceVector_ToRotate);
-			}
-
+		// If wind path is travelling parallel to the player's look vector, horizontal (y axis) key input should curve the path to the players right or left.
+		// Else, if the wind path is travelling perpindicular, curve left/right relative to the wind path.
+		if (FMath::Abs(WindDirection_PathToCenterDot) > .8f)
+		{
 			if (FMath::Abs(LocalSpaceVector_ToRotate.Z) == 1.0f)
 			{
 				// If only pitching up, don't move past the max pitch. Don't move at 90 degrees to avoid gimbal lock.
-				LocalSpaceVector_ToRotate = FVector(1.0f, 0.0f, LocalSpaceVector_ToRotate.Z * FMath::Asin(FMath::DegreesToRadians(MaxPathPitch))).GetSafeNormal();
+				LocalSpaceVector_ToRotate = FVector(FMath::Sign(WindDirection_PathToCenterDot), 0.0f, LocalSpaceVector_ToRotate.Z * FMath::Asin(FMath::DegreesToRadians(MaxPathPitch))).GetSafeNormal();
 			}
-
-			return OriginalPathDirection.Rotation().RotateVector(LocalSpaceVector_ToRotate);
+			return CenterToOwner_Vec.Rotation().RotateVector(LocalSpaceVector_ToRotate);
 		}
+
+		if (FMath::Abs(LocalSpaceVector_ToRotate.Z) == 1.0f)
+		{
+			// If only pitching up, don't move past the max pitch. Don't move at 90 degrees to avoid gimbal lock.
+			LocalSpaceVector_ToRotate = FVector(1.0f, 0.0f, LocalSpaceVector_ToRotate.Z * FMath::Asin(FMath::DegreesToRadians(MaxPathPitch))).GetSafeNormal();
+		}
+
+		return OriginalPathDirection.Rotation().RotateVector(LocalSpaceVector_ToRotate);
 	}
 
 	return CurrentPathDirection;
@@ -185,6 +177,7 @@ void UTPPAbility_PaintTheWind::OnWindPathCompleted_Implementation()
 		TPP_AbilitySystem->UnblockPrimaryAbilityInput();
 	}
 
+	CommitAbilityCooldown(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true);
 	EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, false);
 }
 

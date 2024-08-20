@@ -63,7 +63,7 @@ void AAbilityActor_WindPath::OnWindPathDurationExpired_Implementation()
 
 void AAbilityActor_WindPath::SpawnCollisionVolumeAtCurrentSplinePoint()
 {
-	int32 CurrentIndex = PathSpline->GetNumberOfSplinePoints() - 1;
+	const int32 CurrentIndex = PathSpline->GetNumberOfSplinePoints() - 1;
 
 	const FVector CurrentLocation = PathSpline->GetLocationAtSplinePoint(CurrentIndex, ESplineCoordinateSpace::World);
 	const FVector TangentDir = PathSpline->GetTangentAtSplinePoint(CurrentIndex, ESplineCoordinateSpace::World).GetSafeNormal();
@@ -141,8 +141,6 @@ void AAbilityActor_WindPath::ApplyWindForceToObject(float DeltaTime, AActor* Act
 	UMeshComponent* MeshComp = Actor->GetComponentByClass<UMeshComponent>();
 	if (MeshComp && MeshComp->IsSimulatingPhysics())
 	{
-		//DrawDebugLine(GetWorld(), Actor->GetActorLocation(), ClosestPointToSpline, FColor::Green, false, 2.0f, 0, .4f);
-
 		const FVector ForceTowardSplineVec = PathSpline->FindLocationClosestToWorldLocation(Actor->GetActorLocation(), ESplineCoordinateSpace::World) - Actor->GetActorLocation();
 		const FVector WindDirectionAtSplinePoint = PathSpline->FindTangentClosestToWorldLocation(ClosestPointToSpline, ESplineCoordinateSpace::World).GetSafeNormal();
 		const float DistanceFromPath = ForceTowardSplineVec.Size();
@@ -157,14 +155,12 @@ void AAbilityActor_WindPath::ApplyWindForceToObject(float DeltaTime, AActor* Act
 			MeshComp->AddImpulse(ForceTowardSplineVec.GetSafeNormal() * ForceMagnitudeTowardInnerPath * DeltaTime, NAME_None, false);
 		}
 
-		const float DistanceFromInnerWindPath = ForceTowardSplineVec.Size();
 		const float WindForce = WindForceAlongPath * FMath::Max(.5f, 1.0f - WindPathDistanceRatio);
 		// Apply some extra force in the direction of gravity if we're trying to move upward.
 		const float GravityDot = FMath::Max(WindDirectionAtSplinePoint | FVector::UpVector, 0.0f);
 		const FVector GravityForce = FVector::UpVector * GravityDot * GravityForce;
 		// DrawDebugLine(GetWorld(), Actor->GetActorLocation(), Actor->GetActorLocation() + WindDirectionAtSplinePoint * 165.0f, FColor::Yellow, false, 5.0f, 0, .8f);
 		MeshComp->AddImpulse((GravityForce + (WindDirectionAtSplinePoint * WindForce)) * DeltaTime, NAME_None, false);
-
 	}
 }
 

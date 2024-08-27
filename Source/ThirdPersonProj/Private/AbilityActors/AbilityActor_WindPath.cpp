@@ -3,6 +3,7 @@
 
 #include "AbilityActors/AbilityActor_WindPath.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Interfaces/AbilityForceTarget.h"
 #include "Components/StaticMeshComponent.h"
 
 // Sets default values
@@ -125,42 +126,62 @@ void AAbilityActor_WindPath::TickWindCollisionPhysics(float DeltaTime)
 		if (ActorKVP.Key)
 		{
 			const FVector ClosestPointOnSpline = PathSpline->FindLocationClosestToWorldLocation(ActorKVP.Key->GetActorLocation(), ESplineCoordinateSpace::World);
-
-			FHitResult LOSHitResult;
-			GetWorld()->LineTraceSingleByObjectType(LOSHitResult, ActorKVP.Key->GetActorLocation(), ClosestPointOnSpline, FCollisionObjectQueryParams::AllStaticObjects);
-			if (!LOSHitResult.bBlockingHit)
-			{
 				ApplyWindForceToObject(DeltaTime, ActorKVP.Key, ClosestPointOnSpline);
-			}
 		}
 	}
 }
 
 void AAbilityActor_WindPath::ApplyWindForceToObject(float DeltaTime, AActor* Actor, const FVector& ClosestPointToSpline)
 {
+	IAbilityForceTarget* ForceTargetInterface = Cast<IAbilityForceTarget>(Actor);
 	UMeshComponent* MeshComp = Actor->GetComponentByClass<UMeshComponent>();
-	if (MeshComp && MeshComp->IsSimulatingPhysics())
+	if (!ForceTargetInterface || (!MeshComp || !MeshComp->IsSimulatingPhysics()))
 	{
-		const FVector ForceTowardSplineVec = PathSpline->FindLocationClosestToWorldLocation(Actor->GetActorLocation(), ESplineCoordinateSpace::World) - Actor->GetActorLocation();
-		const FVector WindDirectionAtSplinePoint = PathSpline->FindTangentClosestToWorldLocation(ClosestPointToSpline, ESplineCoordinateSpace::World).GetSafeNormal();
-		const float DistanceFromPath = ForceTowardSplineVec.Size();
-		const float WindPathDistanceRatio = FMath::Min(MaxDistanceFromWindPath, DistanceFromPath) / MaxDistanceFromWindPath;
+		return;
+	}
 
-		// Don't apply wind force toward the center of the path if this force will oppose the direction of the wind.
-		const float TowardPath_WindDirectionDot = ForceTowardSplineVec.GetSafeNormal() | WindDirectionAtSplinePoint;
-		static const float WindPathForceMinimumDot = -.2f;
-		if (TowardPath_WindDirectionDot >= WindPathForceMinimumDot)
+	FHitResult LOSHitResult;
+	GetWorld()->LineTraceSingleByObjectType(LOSHitResult, Actor->GetActorLocation(), ClosestPointToSpline, FCollisionObjectQueryParams::AllStaticObjects);
+	if (LOSHitResult.bBlockingHit)
+	{
+		return;
+	}
+
+	const FVector ForceTowardSplineVec = PathSpline->FindLocationClosestToWorldLocation(Actor->GetActorLocation(), ESplineCoordinateSpace::World) - Actor->GetActorLocation();
+	const FVector WindDirectionAtSplinePoint = PathSpline->FindTangentClosestToWorldLocation(ClosestPointToSpline, ESplineCoordinateSpace::World).GetSafeNormal();
+	const float DistanceFromPath = ForceTowardSplineVec.Size();
+	const float WindPathDistanceRatio = FMath::Min(MaxDistanceFromWindPath, DistanceFromPath) / MaxDistanceFromWindPath;
+
+	// Don't apply wind force toward the center of the path if this force will oppose the direction of the wind.
+	const float TowardPath_WindDirectionDot = ForceTowardSplineVec.GetSafeNormal() | WindDirectionAtSplinePoint;
+	static const float WindPathForceMinimumDot = -.2f;
+	if (TowardPath_WindDirectionDot >= WindPathForceMinimumDot)
+	{
+		const float ForceMagnitudeTowardInnerPath = WindForceTowardsPath * WindPathDistanceRatio;
+		const FVector ForceToApply = ForceTowardSplineVec.GetSafeNormal() * ForceMagnitudeTowardInnerPath * DeltaTime;
+		if (ForceTargetInterface)
 		{
-			const float ForceMagnitudeTowardInnerPath = WindForceTowardsPath * WindPathDistanceRatio;
-			MeshComp->AddImpulse(ForceTowardSplineVec.GetSafeNormal() * ForceMagnitudeTowardInnerPath * DeltaTime, NAME_None, false);
+			ForceTargetInterface->TryAddForceToTarget(this, nullptr, ForceToApply);
 		}
+		else if (MeshComp)
+		{
+			MeshComp->AddImpulse(ForceToApply, NAME_None, false);
+		}
+	}
 
-		const float WindForce = WindForceAlongPath * FMath::Max(.5f, 1.0f - WindPathDistanceRatio);
-		// Apply some extra force in the direction of gravity if we're trying to move upward.
-		const float GravityDot = FMath::Max(WindDirectionAtSplinePoint | FVector::UpVector, 0.0f);
-		const FVector GravityForce = FVector::UpVector * GravityDot * GravityForce;
-		// DrawDebugLine(GetWorld(), Actor->GetActorLocation(), Actor->GetActorLocation() + WindDirectionAtSplinePoint * 165.0f, FColor::Yellow, false, 5.0f, 0, .8f);
-		MeshComp->AddImpulse((GravityForce + (WindDirectionAtSplinePoint * WindForce)) * DeltaTime, NAME_None, false);
+	const float WindForce = WindForceAlongPath * FMath::Max(.5f, 1.0f - WindPathDistanceRatio);
+	// Apply some extra force in the direction of gravity if we're trying to move upward.
+	const float GravityDot = FMath::Max(WindDirectionAtSplinePoint | FVector::UpVector, 0.0f);
+	const FVector GravityForce = FVector::UpVector * GravityDot * GravityForce;
+	const FVector ForceToApply = (GravityForce + (WindDirectionAtSplinePoint * WindForce)) * DeltaTime;
+
+	if (ForceTargetInterface)
+	{
+		ForceTargetInterface->TryAddForceToTarget(this, nullptr, ForceToApply);
+	}
+	else if (MeshComp)
+	{
+		MeshComp->AddImpulse(ForceToApply, NAME_None, false);
 	}
 }
 

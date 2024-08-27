@@ -82,7 +82,7 @@ void AThirdPersonProjCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
-	if (TPPAbilitySystemComponent)
+	if (TPPAbilitySystemComponent && InputComponent)
 	{
 		const FTopLevelAssetPath InputEnumPath = FTopLevelAssetPath(TEXT("/Script/GameplayAbilities"), TEXT("EGameplayAbilityInputBinds"));
 		const FGameplayAbilityInputBinds Binds(TEXT("Confirm"), TEXT("Cancel"), InputEnumPath, 0 ,1);

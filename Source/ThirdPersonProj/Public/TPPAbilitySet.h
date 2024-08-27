@@ -27,6 +27,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = AbilitySet)
 	FGameplayAbilityBindInfo JumpAbility;
 
-	virtual void GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& PrimarySpecHandles, TArray<FGameplayAbilitySpecHandle>& SecondarySpecHandles, TArray<FGameplayAbilitySpecHandle>& PassiveAbilityHandles, FGameplayAbilitySpecHandle& JumpAbilityHandle) const;
+	UPROPERTY(EditAnywhere, Category = AbilitySet)
+	FGameplayAbilityBindInfo MeleeAbility;
+
+	virtual void GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& PrimarySpecHandles, TArray<FGameplayAbilitySpecHandle>& SecondarySpecHandles, TArray<FGameplayAbilitySpecHandle>& PassiveAbilityHandles, FGameplayAbilitySpecHandle& JumpAbilityHandle, FGameplayAbilitySpecHandle& MeleeAbilityHandle) const;
 	
 };

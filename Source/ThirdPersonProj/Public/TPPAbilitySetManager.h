@@ -62,6 +62,9 @@ protected:
 	UPROPERTY(Transient)
 	FGameplayAbilitySpecHandle JumpAbilityHandle;
 
+	UPROPERTY(Transient)
+	FGameplayAbilitySpecHandle MeleeAbilityHandle;
+
 public:
 
 	UFUNCTION(BlueprintCallable)

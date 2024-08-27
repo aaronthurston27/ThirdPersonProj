@@ -4,7 +4,8 @@
 #include "TPPAbilitySet.h"
 #include "AbilitySystemComponent.h"
 
-void UTPPAbilitySet::GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& PrimarySpecHandles, TArray<FGameplayAbilitySpecHandle>& SecondarySpecHandles, TArray<FGameplayAbilitySpecHandle>& PassiveAbilityHandles, FGameplayAbilitySpecHandle& JumpAbilityHandle) const
+void UTPPAbilitySet::GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& PrimarySpecHandles, TArray<FGameplayAbilitySpecHandle>& SecondarySpecHandles, 
+	TArray<FGameplayAbilitySpecHandle>& PassiveAbilityHandles, FGameplayAbilitySpecHandle& JumpAbilityHandle, FGameplayAbilitySpecHandle& MeleeAbilityHandle) const
 {
 	for (const FGameplayAbilityBindInfo& BindInfo : Abilities)
 	{
@@ -46,5 +47,11 @@ void UTPPAbilitySet::GiveAbilities_ReturnHandles(UAbilitySystemComponent* Abilit
 	{
 		// Ability 7 is jump.
 		JumpAbilityHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(JumpAbility.GameplayAbilityClass, 1, (int32)EGameplayAbilityInputBinds::Ability7));
+	}
+
+	if (MeleeAbility.GameplayAbilityClass)
+	{
+		// Ability 5 is melee.
+		JumpAbilityHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(MeleeAbility.GameplayAbilityClass, 1, (int32)EGameplayAbilityInputBinds::Ability5));
 	}
 }

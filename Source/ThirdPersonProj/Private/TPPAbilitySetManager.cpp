@@ -56,6 +56,7 @@ void UTPPAbilitySetManager::SetActiveAbilitySet(UTPPAbilitySet* NewAbilitySet)
 		AllHandles.Append(PrimaryAbilityHandles);
 		AllHandles.Append(SecondaryAbilityHandles);
 		AllHandles.Append(PassiveAbilityHandles);
+		AllHandles.Add(UltimateAbilityHandle);
 		AllHandles.Add(JumpAbilityHandle);
 		AllHandles.Add(MeleeAbilityHandle);
 
@@ -69,6 +70,7 @@ void UTPPAbilitySetManager::SetActiveAbilitySet(UTPPAbilitySet* NewAbilitySet)
 		PassiveAbilityHandles.Empty();
 		JumpAbilityHandle = FGameplayAbilitySpecHandle();
 		MeleeAbilityHandle = FGameplayAbilitySpecHandle();
+		UltimateAbilityHandle = FGameplayAbilitySpecHandle();
 	}
 
 	ActiveAbilitySet = NewAbilitySet;
@@ -76,7 +78,7 @@ void UTPPAbilitySetManager::SetActiveAbilitySet(UTPPAbilitySet* NewAbilitySet)
 	if (ActiveAbilitySet)
 	{
 		TArray<FGameplayAbilitySpecHandle> Passives;
-		ActiveAbilitySet->GiveAbilities_ReturnHandles(CachedAbilitySystem, PrimaryAbilityHandles, SecondaryAbilityHandles, Passives, JumpAbilityHandle, MeleeAbilityHandle);
+		ActiveAbilitySet->GiveAbilities_ReturnHandles(CachedAbilitySystem, PrimaryAbilityHandles, SecondaryAbilityHandles, Passives, JumpAbilityHandle, MeleeAbilityHandle, UltimateAbilityHandle);
 
 		if (PrimaryAbilityHandles.Num() > 0)
 		{

@@ -47,16 +47,16 @@ public:
 	 * @param AnimRootMotionTranslationScale Change to modify size of root motion or set to 0 to block it entirely
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Ability|Tasks", meta = (DisplayName = "PlayMontageAndWaitForEvent",
-		HidePin = "OwningAbility_2", DefaultToSelf = "OwningAbility_2", BlueprintInternalUseOnly = "TRUE"))
+		HidePin = "OwningAbility_", DefaultToSelf = "OwningAbility_", BlueprintInternalUseOnly = "TRUE"))
 	static UAT_PlayMontageAndWaitForEvent* PlayMontageAndWaitForEvent(
-		UGameplayAbility* OwningAbility_2,
-		FName TaskInstanceName_2,
-		UAnimMontage* MontageToPlay_2,
+		UGameplayAbility* OwningAbility_,
+		FName TaskInstanceName_,
+		UAnimMontage* MontageToPlay_,
 		FGameplayTagContainer TagContainer,
-		float Rate_2 = 1.f,
-		FName StartSection_2 = NAME_None,
-		bool bStopWhenAbilityEnds_2 = true,
-		float AnimRootMotionTranslationScale_2 = 1.f);
+		float Rate_ = 1.f,
+		FName StartSection_ = NAME_None,
+		bool bStopWhenAbilityEnds_ = true,
+		float AnimRootMotionTranslationScale_ = 1.f);
 
 private:
 

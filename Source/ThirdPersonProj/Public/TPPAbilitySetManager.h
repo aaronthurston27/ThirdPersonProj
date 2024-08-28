@@ -60,6 +60,9 @@ protected:
 	TArray<FGameplayAbilitySpecHandle> PassiveAbilityHandles;
 
 	UPROPERTY(Transient)
+	FGameplayAbilitySpecHandle UltimateAbilityHandle;
+
+	UPROPERTY(Transient)
 	FGameplayAbilitySpecHandle JumpAbilityHandle;
 
 	UPROPERTY(Transient)

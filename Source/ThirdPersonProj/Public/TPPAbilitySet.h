@@ -22,6 +22,9 @@ public:
 	TArray<FGameplayAbilityBindInfo> SecondaryAbilities;
 
 	UPROPERTY(EditAnywhere, Category = AbilitySet)
+	FGameplayAbilityBindInfo UltimateAbility;
+
+	UPROPERTY(EditAnywhere, Category = AbilitySet)
 	TArray < TSubclassOf < UGameplayAbility >> PassiveAbilities;
 
 	UPROPERTY(EditAnywhere, Category = AbilitySet)
@@ -30,6 +33,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = AbilitySet)
 	FGameplayAbilityBindInfo MeleeAbility;
 
-	virtual void GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& PrimarySpecHandles, TArray<FGameplayAbilitySpecHandle>& SecondarySpecHandles, TArray<FGameplayAbilitySpecHandle>& PassiveAbilityHandles, FGameplayAbilitySpecHandle& JumpAbilityHandle, FGameplayAbilitySpecHandle& MeleeAbilityHandle) const;
+	virtual void GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& PrimarySpecHandles, TArray<FGameplayAbilitySpecHandle>& SecondarySpecHandles, TArray<FGameplayAbilitySpecHandle>& PassiveAbilityHandles, 
+		FGameplayAbilitySpecHandle& JumpAbilityHandle, FGameplayAbilitySpecHandle& MeleeAbilityHandle, FGameplayAbilitySpecHandle& UltimateAbilityHandle) const;
 	
 };

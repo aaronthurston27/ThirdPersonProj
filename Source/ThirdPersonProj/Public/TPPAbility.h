@@ -51,6 +51,11 @@ protected:
 	UPROPERTY(Transient, BlueprintReadOnly)
 	AThirdPersonProjCharacter* CachedCharacterOwner = nullptr;
 
+protected:
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bCanActivateWhileAirborne = true;
+
 public:
 
 	UFUNCTION(BlueprintPure)

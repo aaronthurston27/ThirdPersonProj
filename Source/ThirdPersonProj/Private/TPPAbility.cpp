@@ -2,6 +2,7 @@
 
 
 #include "TPPAbility.h"
+#include "TPPMovementComponent.h"
 #include "ThirdPersonProj/ThirdPersonProjCharacter.h"
 
 UTPPAbility::UTPPAbility()
@@ -55,6 +56,11 @@ void UTPPAbility::SetAbilityInputResponse(bool bShouldRespondToInput)
 bool UTPPAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
 {
 	if (!bShouldAbilityRespondToInput && !bRespondToInputWhenInactive)
+	{
+		return false;
+	}
+
+	if (!bCanActivateWhileAirborne && CachedCharacterOwner->GetThirdPersonMovementComponent()->IsFalling())
 	{
 		return false;
 	}

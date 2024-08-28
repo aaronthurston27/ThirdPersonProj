@@ -5,7 +5,7 @@
 #include "AbilitySystemComponent.h"
 
 void UTPPAbilitySet::GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& PrimarySpecHandles, TArray<FGameplayAbilitySpecHandle>& SecondarySpecHandles, 
-	TArray<FGameplayAbilitySpecHandle>& PassiveAbilityHandles, FGameplayAbilitySpecHandle& JumpAbilityHandle, FGameplayAbilitySpecHandle& MeleeAbilityHandle) const
+	TArray<FGameplayAbilitySpecHandle>& PassiveAbilityHandles, FGameplayAbilitySpecHandle& JumpAbilityHandle, FGameplayAbilitySpecHandle& MeleeAbilityHandle, FGameplayAbilitySpecHandle& UltimateAbilityHandle) const
 {
 	for (const FGameplayAbilityBindInfo& BindInfo : Abilities)
 	{
@@ -41,6 +41,11 @@ void UTPPAbilitySet::GiveAbilities_ReturnHandles(UAbilitySystemComponent* Abilit
 				PassiveAbilityHandles.Add(PassiveHandle);
 			}
 		}
+	}
+
+	if (UltimateAbility.GameplayAbilityClass)
+	{
+		UltimateAbilityHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(UltimateAbility.GameplayAbilityClass, 1, (int32)EGameplayAbilityInputBinds::Ability3));
 	}
 
 	if (JumpAbility.GameplayAbilityClass)

@@ -23,28 +23,34 @@ class THIRDPERSONPROJ_API UTPPAbilitySystemComponent : public UAbilitySystemComp
 public:
 
 	UFUNCTION(BlueprintCallable)
-	void BlockPrimaryAbilityInput();
+	void BlockPrimaryAbilityInput(const FName BlockReason);
 
 	UFUNCTION(BlueprintCallable)
-	void UnblockPrimaryAbilityInput();
+	void UnblockPrimaryAbilityInput(const FName BlockReason);
 
 	UFUNCTION(BlueprintPure)
-	bool IsPrimaryAbilityInputBlocked() const;
+	bool IsPrimaryAbilityInputBlocked(const FName BlockReason = NAME_None) const;
 
 	UFUNCTION(BlueprintCallable)
-	void BlockSecondaryAbilityInput();
+	void BlockSecondaryAbilityInput(const FName BlockReason);
 
 	UFUNCTION(BlueprintCallable)
-	void UnblockSecondaryAbilityInput();
+	void UnblockSecondaryAbilityInput(const FName BlockReason);
 
 	UFUNCTION(BlueprintPure)
-	bool IsSecondaryAbilityInputBlocked() const;
+	bool IsSecondaryAbilityInputBlocked(const FName BlockReason = NAME_None) const;
 
 	UFUNCTION(BlueprintCallable)
-	void BlockJumpAbilityInput();
+	void BlockJumpAbilityInput(const FName BlockReason);
 
 	UFUNCTION(BlueprintCallable)
-	void UnblockJumpAbilityInput();
+	void UnblockJumpAbilityInput(const FName BlockReason);
+
+	UFUNCTION(BlueprintCallable)
+	void BlockUltimateAbilityInput(const FName BlockReason);
+
+	UFUNCTION(BlueprintCallable)
+	void UnblockUltimateAbilityInput(const FName BlockReason);
 
 	UFUNCTION(BlueprintCallable)
 	void CancelAbilitiesByTag(const FGameplayTagContainer& TagContainer);
@@ -59,6 +65,18 @@ protected:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnBaseGameplayTagCountChanged OnBaseGameplayTagCountChanged;
+
+	UPROPERTY(Transient)
+	TSet<FName> PrimaryAbilityBlockReasons;
+
+	UPROPERTY(Transient)
+	TSet<FName> SecondaryAbilityBlockReasons;
+
+	UPROPERTY(Transient)
+	TSet<FName> UltimateAbilityBlockReasons;
+
+	UPROPERTY(Transient)
+	TSet<FName> JumpAbilityBlockReasons;
 
 private:
 

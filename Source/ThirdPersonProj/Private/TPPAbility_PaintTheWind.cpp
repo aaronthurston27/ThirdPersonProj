@@ -161,7 +161,7 @@ void UTPPAbility_PaintTheWind::OnWindPathActorCreated_Implementation()
 	UTPPAbilitySystemComponent* TPP_AbilitySystem = Cast<UTPPAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());
 	if (TPP_AbilitySystem)
 	{
-		TPP_AbilitySystem->BlockPrimaryAbilityInput();
+		TPP_AbilitySystem->BlockPrimaryAbilityInput(FName(TEXT("PaintTheWind")));
 	}
 }
 
@@ -174,7 +174,7 @@ void UTPPAbility_PaintTheWind::OnWindPathCompleted_Implementation()
 	UTPPAbilitySystemComponent* TPP_AbilitySystem = Cast<UTPPAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());
 	if (TPP_AbilitySystem)
 	{
-		TPP_AbilitySystem->UnblockPrimaryAbilityInput();
+		TPP_AbilitySystem->UnblockPrimaryAbilityInput(FName(TEXT("PaintTheWind")));
 	}
 
 	CommitAbilityCooldown(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true);

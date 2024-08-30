@@ -126,7 +126,7 @@ void AAbilityActor_WindPath::TickWindCollisionPhysics(float DeltaTime)
 		if (ActorKVP.Key)
 		{
 			const FVector ClosestPointOnSpline = PathSpline->FindLocationClosestToWorldLocation(ActorKVP.Key->GetActorLocation(), ESplineCoordinateSpace::World);
-				ApplyWindForceToObject(DeltaTime, ActorKVP.Key, ClosestPointOnSpline);
+			ApplyWindForceToObject(DeltaTime, ActorKVP.Key, ClosestPointOnSpline);
 		}
 	}
 }

@@ -24,6 +24,11 @@ class THIRDPERSONPROJ_API IAbilityForceTarget
 public:
 
 	UFUNCTION(BlueprintNativeEvent)
+	bool CanApplyForceToTarget(const AActor* ActorSource, const UActorComponent* SourceComponent);
+	
+	bool CanApplyForceToTarget_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent);
+
+	UFUNCTION(BlueprintNativeEvent)
 	void TryAddForceToTarget(const AActor* ActorSource, const UActorComponent* SourceComponent, const FVector& Force, const FName& BoneName = FName(TEXT("None")));
 
 	void TryAddForceToTarget_Implementation(const AActor* SourceActor, const UActorComponent* SourceComponent, const FVector& Force, const FName& BoneName);

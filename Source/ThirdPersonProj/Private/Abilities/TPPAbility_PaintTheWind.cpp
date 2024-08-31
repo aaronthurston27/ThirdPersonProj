@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "TPPAbility_PaintTheWind.h"
+#include "Abilities/TPPAbility_PaintTheWind.h"
 #include "AbilityActors/AbilityActor_WindPath.h"
 #include "ThirdPersonProj/ThirdPersonProjCharacter.h"
 #include "TPPAbilitySystemComponent.h"

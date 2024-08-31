@@ -2,7 +2,7 @@
 
 
 #include "AbilityActors/AbilityTargetActor_WindPaint.h"
-#include "TPPAbility_PaintTheWind.h"
+#include "Abilities/TPPAbility_PaintTheWind.h"
 #include "ThirdPersonProj/ThirdPersonProjCharacter.h"
 
 void AAbilityTargetActor_WindPaint::StartTargeting(UGameplayAbility* InAbility)

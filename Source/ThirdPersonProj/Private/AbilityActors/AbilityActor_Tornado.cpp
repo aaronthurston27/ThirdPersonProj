@@ -74,10 +74,23 @@ void AAbilityActor_Tornado::CalculateForceVectors(AActor* Actor, UPrimitiveCompo
 
 	const FVector ActorToTornadoCenterVec = Actor->GetActorLocation() - TornadoCollisionMesh->GetComponentLocation();
 	const float TornadoCenterDistanceRatio = FMath::Min(MaxDistanceFromTornadoCenter, ActorToTornadoCenterVec.Size2D()) / MaxDistanceFromTornadoCenter;
+	
+	FHitResult LOSHitResult;
+	const FVector TornadoCenterTraceEndLocation = FVector(TornadoCollisionMesh->GetComponentLocation().X, TornadoCollisionMesh->GetComponentLocation().Y, Actor->GetActorLocation().Z);
+	GetWorld()->LineTraceSingleByObjectType(LOSHitResult, Actor->GetActorLocation(), TornadoCenterTraceEndLocation, FCollisionObjectQueryParams::AllStaticObjects);
+	if (!LOSHitResult.bBlockingHit)
+	{
+		CentripetalForceVector = -ActorToTornadoCenterVec.GetSafeNormal2D() * TangentialForce * TornadoCenterDistanceRatio * CentripetalForceMultiplier * DeltaTime;
+	}
+	else
+	{
+		CentripetalForceVector = FVector::ZeroVector;
+	}
 
 	float Radius, Height;
 	TornadoCollisionMesh->CalcBoundingCylinder(Radius, Height);
 	const FVector ClosestPointToEdge = TornadoCollisionMesh->GetComponentLocation() + (ActorToTornadoCenterVec.GetSafeNormal2D() * Radius);
+	//DrawDebugLine(GetWorld(), ClosestPointToEdge, ClosestPointToEdge + TangentialForceVector.GetSafeNormal2D() * 200.0f, FColor::Red, false, 8.0f, 0, .8f);
 
 	const FVector EdgeToCenterVec = ClosestPointToEdge - TornadoCollisionMesh->GetComponentLocation();
 	const FVector TangentialVelocityVec = (EdgeToCenterVec ^ FVector::UpVector).GetSafeNormal();
@@ -85,8 +98,5 @@ void AAbilityActor_Tornado::CalculateForceVectors(AActor* Actor, UPrimitiveCompo
 	TangentialForceVector = TangentialVelocityVec.GetSafeNormal() * TangentialForce * FMath::Max(1.0f - TornadoCenterDistanceRatio, .2f);
 	TangentialForceVector += FVector::UpVector * UpwardForce;
 	TangentialForceVector *= DeltaTime;
-
-	CentripetalForceVector = -ActorToTornadoCenterVec.GetSafeNormal2D() * TangentialForce * TornadoCenterDistanceRatio * CentripetalForceMultiplier * DeltaTime;
-	//DrawDebugLine(GetWorld(), ClosestPointToEdge, ClosestPointToEdge + TangentialForceVector.GetSafeNormal2D() * 200.0f, FColor::Red, false, 8.0f, 0, .8f);
 }
 

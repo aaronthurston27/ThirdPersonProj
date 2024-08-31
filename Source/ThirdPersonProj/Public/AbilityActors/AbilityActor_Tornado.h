@@ -17,10 +17,10 @@ public:
 
 protected:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	UStaticMeshComponent* TornadoCollisionMesh;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	float TangentialForce = 1500.0f;
 
 	UPROPERTY(EditDefaultsOnly)

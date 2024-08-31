@@ -4,7 +4,7 @@
 #include "TPPAbilitySetManager.h"
 #include "ThirdPersonProj/ThirdPersonProjCharacter.h"
 #include "TPPAbilitySet.h"
-#include "TPPAbility.h"
+#include "Abilities/TPPAbility.h"
 #include "TPPAbilitySystemComponent.h"
 
 // Sets default values for this component's properties

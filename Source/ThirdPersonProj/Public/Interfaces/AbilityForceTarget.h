@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "GameplayTagContainer.h"
 #include "AbilityForceTarget.generated.h"
 
 // This class does not need to be modified.
@@ -24,12 +25,12 @@ class THIRDPERSONPROJ_API IAbilityForceTarget
 public:
 
 	UFUNCTION(BlueprintNativeEvent)
-	bool CanApplyForceToTarget(const AActor* ActorSource, const UActorComponent* SourceComponent);
+	bool CanApplyForceToTarget(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FName& BoneName = FName(TEXT("None")), const FGameplayTag& ForceTag = FGameplayTag::EmptyTag);
 	
-	bool CanApplyForceToTarget_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent);
+	bool CanApplyForceToTarget_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FName& BoneName = FName(TEXT("None")), const FGameplayTag& ForceTag = FGameplayTag::EmptyTag);
 
 	UFUNCTION(BlueprintNativeEvent)
-	void TryAddForceToTarget(const AActor* ActorSource, const UActorComponent* SourceComponent, const FVector& Force, const FName& BoneName = FName(TEXT("None")));
+	void AddForceToTarget(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Force, const FName& BoneName = FName(TEXT("None")), const FGameplayTag& ForceTag = FGameplayTag::EmptyTag);
 
-	void TryAddForceToTarget_Implementation(const AActor* SourceActor, const UActorComponent* SourceComponent, const FVector& Force, const FName& BoneName);
+	void AddForceToTarget_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Force, const FName& BoneName, const FGameplayTag& ForceTag);
 };

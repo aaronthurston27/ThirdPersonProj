@@ -5,11 +5,11 @@
 
 // Add default functionality here for any IAbilityForceTarget functions that are not pure virtual.
 
-bool IAbilityForceTarget::CanApplyForceToTarget_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent)
+bool IAbilityForceTarget::CanApplyForceToTarget_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FName& BoneName, const FGameplayTag& ForceTag)
 {
     return true;
 }
 
-void IAbilityForceTarget::TryAddForceToTarget_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const FVector& Force, const FName& BoneName)
+void IAbilityForceTarget::AddForceToTarget_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Force, const FName& BoneName, const FGameplayTag& ForceTag)
 {
 }

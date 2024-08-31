@@ -43,12 +43,14 @@ void AAbilityActor_Tornado::TickTornadoCollisions(float DeltaTime)
 		}
 
 		IAbilityForceTarget* ForceTarget = Cast<IAbilityForceTarget>(Component->GetOwner());
-		if (ForceTarget)
+		if (Component->GetOwner()->GetClass()->ImplementsInterface(UAbilityForceTarget::StaticClass()))
 		{
-			if (ForceTarget->CanApplyForceToTarget(this, TornadoCollisionMesh))
+			if (IAbilityForceTarget::Execute_CanApplyForceToTarget(Component->GetOwner(), this, TornadoCollisionMesh, Component, NAME_None, FGameplayTag::EmptyTag))
 			{
 				CalculateForceVectors(Component->GetOwner(), Component, DeltaTime, TangentialForceVector, CentripetalForceVector);
 				VisitedActors.Add(Component->GetOwner());
+				IAbilityForceTarget::Execute_AddForceToTarget(Component->GetOwner(), this, TornadoCollisionMesh, Component, TangentialForceVector, NAME_None, FGameplayTag::EmptyTag);
+				IAbilityForceTarget::Execute_AddForceToTarget(Component->GetOwner(), this, TornadoCollisionMesh, Component, CentripetalForceVector, NAME_None, FGameplayTag::EmptyTag);
 			}
 		}
 		else if (UMeshComponent* MeshComp = Cast<UMeshComponent>(Component))
@@ -56,6 +58,7 @@ void AAbilityActor_Tornado::TickTornadoCollisions(float DeltaTime)
 			if (MeshComp->IsSimulatingPhysics())
 			{
 				CalculateForceVectors(Component->GetOwner(), Component, DeltaTime, TangentialForceVector, CentripetalForceVector);
+				VisitedActors.Add(Component->GetOwner());
 				MeshComp->AddImpulse(TangentialForceVector);
 				MeshComp->AddImpulse(CentripetalForceVector, NAME_None, false);
 			}

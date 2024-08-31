@@ -77,10 +77,6 @@ void AAbilityActor_WindPath::SpawnCollisionVolumeAtCurrentSplinePoint()
 		CollisionStaticMeshSubobject->AttachToComponent(PathSpline, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		FinishAddComponent(CollisionStaticMeshSubobject, true, FTransform::Identity);
 
-		// Add collision events before enabling collision so that updates are correctly called.
-		CollisionStaticMeshSubobject->OnComponentBeginOverlap.AddDynamic(this, &AAbilityActor_WindPath::OnWindMeshCollisionOverlapBegin);
-		CollisionStaticMeshSubobject->OnComponentEndOverlap.AddDynamic(this, &AAbilityActor_WindPath::OnWindMeshCollisionOverlapEnd);
-
 		CollisionStaticMeshSubobject->SetWorldLocationAndRotation(CurrentLocation, MeshRotation, false);
 		CollisionStaticMeshSubobject->SetWorldScale3D(WindCollisionStaticMeshScale);
 		CollisionStaticMeshSubobject->SetStaticMesh(CollisionStaticMesh);
@@ -92,62 +88,53 @@ void AAbilityActor_WindPath::SpawnCollisionVolumeAtCurrentSplinePoint()
 	PreviousSplineCollisionMeshIndex = CurrentIndex;
 }
 
-void AAbilityActor_WindPath::OnWindMeshCollisionOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (OtherActor && !OtherActor->IsA<APawn>() && OtherActor != this && !OtherActor->IsA<AAbilityActor_WindPath>())
-	{
-		if (OverlappedActors.Contains(OtherActor))
-		{
-			OverlappedActors[OtherActor]++;
-		}
-		else
-		{
-			OverlappedActors.Add(OtherActor, 1);
-		}
-	}
-}
-
-void AAbilityActor_WindPath::OnWindMeshCollisionOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	if (OverlappedActors.Contains(OtherActor))
-	{
-		--OverlappedActors[OtherActor];
-		if (OverlappedActors[OtherActor] == 0)
-		{
-			OverlappedActors.Remove(OtherActor);
-		}
-	}
-}
-
 void AAbilityActor_WindPath::TickWindCollisionPhysics(float DeltaTime)
 {
-	for (auto& ActorKVP: OverlappedActors)
+	for (UPrimitiveComponent* WindCollisionComp : WindCollisionMeshes)
 	{
-		if (ActorKVP.Key)
+		TSet<AActor*> AppliedForceActors;
+
+		TArray<UPrimitiveComponent*> OverlappingComponents;
+		WindCollisionComp->GetOverlappingComponents(OverlappingComponents);
+
+		for (UPrimitiveComponent* OverlappingComp : OverlappingComponents)
 		{
-			const FVector ClosestPointOnSpline = PathSpline->FindLocationClosestToWorldLocation(ActorKVP.Key->GetActorLocation(), ESplineCoordinateSpace::World);
-			ApplyWindForceToObject(DeltaTime, ActorKVP.Key, ClosestPointOnSpline);
+			if (AppliedForceActors.Contains(OverlappingComp->GetOwner()))
+			{
+				continue;
+			}
+
+			if (OverlappingComp->GetOwner() != this && OverlappingComp != nullptr)
+			{
+				const FVector ClosestPointOnSpline = PathSpline->FindLocationClosestToWorldLocation(OverlappingComp->GetComponentLocation(), ESplineCoordinateSpace::World);
+				if (ApplyWindForceToObject(DeltaTime, WindCollisionComp, OverlappingComp, ClosestPointOnSpline))
+				{
+					AppliedForceActors.Add(OverlappingComp->GetOwner());
+				}
+			}
 		}
 	}
 }
 
-void AAbilityActor_WindPath::ApplyWindForceToObject(float DeltaTime, AActor* Actor, const FVector& ClosestPointToSpline)
+bool AAbilityActor_WindPath::ApplyWindForceToObject(float DeltaTime, UPrimitiveComponent* SourceComponent, UPrimitiveComponent* TargetComponent, const FVector& ClosestPointToSpline)
 {
-	IAbilityForceTarget* ForceTargetInterface = Cast<IAbilityForceTarget>(Actor);
-	UMeshComponent* MeshComp = Actor->GetComponentByClass<UMeshComponent>();
-	if (!ForceTargetInterface || (!MeshComp || !MeshComp->IsSimulatingPhysics()))
+	UMeshComponent* MeshComp = Cast<UMeshComponent>(TargetComponent);
+	if (!IAbilityForceTarget::Execute_CanApplyForceToTarget(TargetComponent->GetOwner(), this, SourceComponent, TargetComponent, NAME_None, FGameplayTag::EmptyTag))
 	{
-		return;
+		if (!MeshComp || MeshComp->IsSimulatingPhysics())
+		{
+			return false;
+		}
 	}
 
 	FHitResult LOSHitResult;
-	GetWorld()->LineTraceSingleByObjectType(LOSHitResult, Actor->GetActorLocation(), ClosestPointToSpline, FCollisionObjectQueryParams::AllStaticObjects);
+	GetWorld()->LineTraceSingleByObjectType(LOSHitResult, TargetComponent->GetComponentLocation(), ClosestPointToSpline, FCollisionObjectQueryParams::AllStaticObjects);
 	if (LOSHitResult.bBlockingHit)
 	{
-		return;
+		return false;
 	}
 
-	const FVector ForceTowardSplineVec = PathSpline->FindLocationClosestToWorldLocation(Actor->GetActorLocation(), ESplineCoordinateSpace::World) - Actor->GetActorLocation();
+	const FVector ForceTowardSplineVec = PathSpline->FindLocationClosestToWorldLocation(TargetComponent->GetComponentLocation(), ESplineCoordinateSpace::World) - TargetComponent->GetComponentLocation();
 	const FVector WindDirectionAtSplinePoint = PathSpline->FindTangentClosestToWorldLocation(ClosestPointToSpline, ESplineCoordinateSpace::World).GetSafeNormal();
 	const float DistanceFromPath = ForceTowardSplineVec.Size();
 	const float WindPathDistanceRatio = FMath::Min(MaxDistanceFromWindPath, DistanceFromPath) / MaxDistanceFromWindPath;
@@ -159,9 +146,9 @@ void AAbilityActor_WindPath::ApplyWindForceToObject(float DeltaTime, AActor* Act
 	{
 		const float ForceMagnitudeTowardInnerPath = WindForceTowardsPath * WindPathDistanceRatio;
 		const FVector ForceToApply = ForceTowardSplineVec.GetSafeNormal() * ForceMagnitudeTowardInnerPath * DeltaTime;
-		if (ForceTargetInterface)
+		if (TargetComponent->GetOwner()->GetClass()->ImplementsInterface(UAbilityForceTarget::StaticClass()))
 		{
-			ForceTargetInterface->TryAddForceToTarget(this, nullptr, ForceToApply);
+			IAbilityForceTarget::Execute_AddForceToTarget(TargetComponent->GetOwner(), this, nullptr, TargetComponent, ForceToApply, NAME_Name, FGameplayTag::EmptyTag);
 		}
 		else if (MeshComp)
 		{
@@ -175,13 +162,15 @@ void AAbilityActor_WindPath::ApplyWindForceToObject(float DeltaTime, AActor* Act
 	const FVector GravityForce = FVector::UpVector * GravityDot * GravityForce;
 	const FVector ForceToApply = (GravityForce + (WindDirectionAtSplinePoint * WindForce)) * DeltaTime;
 
-	if (ForceTargetInterface)
+	if (TargetComponent->GetOwner()->GetClass()->ImplementsInterface(UAbilityForceTarget::StaticClass()))
 	{
-		ForceTargetInterface->TryAddForceToTarget(this, nullptr, ForceToApply);
+		IAbilityForceTarget::Execute_AddForceToTarget(TargetComponent->GetOwner(), this, nullptr, TargetComponent, ForceToApply, NAME_Name, FGameplayTag::EmptyTag);
 	}
 	else if (MeshComp)
 	{
 		MeshComp->AddImpulse(ForceToApply, NAME_None, false);
 	}
+
+	return true;
 }
 

@@ -61,15 +61,6 @@ protected:
 	UPROPERTY(Transient)
 	TArray<UStaticMeshComponent*> WindCollisionMeshes;
 
-	UPROPERTY(Transient)
-	TMap<AActor*, int32> OverlappedActors;
-
-	UFUNCTION()
-	void OnWindMeshCollisionOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
-	void OnWindMeshCollisionOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
 	UPROPERTY(EditDefaultsOnly, Category = "Wind Force", meta = (UIMin = "1.0", ClampMin = "1.0"))
 	float WindForceTowardsPath = 4000.0f;
 
@@ -84,7 +75,7 @@ protected:
 
 	void TickWindCollisionPhysics(float DeltaTime);
 
-	void ApplyWindForceToObject(float DeltaTime, AActor* Actor, const FVector& ClosestPointToSpline);
+	bool ApplyWindForceToObject(float DeltaTime, UPrimitiveComponent* SourceComponent, UPrimitiveComponent* TargetComponent, const FVector& ClosestPointToSpline);
 
 public:	
 	// Called every frame

@@ -107,7 +107,7 @@ void AAbilityActor_WindPath::TickWindCollisionPhysics(float DeltaTime)
 			if (OverlappingComp->GetOwner() != this && OverlappingComp != nullptr)
 			{
 				const FVector ClosestPointOnSpline = PathSpline->FindLocationClosestToWorldLocation(OverlappingComp->GetComponentLocation(), ESplineCoordinateSpace::World);
-				if (ApplyWindForceToObject(DeltaTime, WindCollisionComp, OverlappingComp, ClosestPointOnSpline))
+				if (ApplyWindForceToObject(WindCollisionComp, OverlappingComp, ClosestPointOnSpline))
 				{
 					AppliedForceActors.Add(OverlappingComp->GetOwner());
 				}
@@ -116,15 +116,20 @@ void AAbilityActor_WindPath::TickWindCollisionPhysics(float DeltaTime)
 	}
 }
 
-bool AAbilityActor_WindPath::ApplyWindForceToObject(float DeltaTime, UPrimitiveComponent* SourceComponent, UPrimitiveComponent* TargetComponent, const FVector& ClosestPointToSpline)
+bool AAbilityActor_WindPath::ApplyWindForceToObject(UPrimitiveComponent* SourceComponent, UPrimitiveComponent* TargetComponent, const FVector& ClosestPointToSpline)
 {
 	UMeshComponent* MeshComp = Cast<UMeshComponent>(TargetComponent);
-	if (!IAbilityForceTarget::Execute_CanApplyForceToTarget(TargetComponent->GetOwner(), this, SourceComponent, TargetComponent, NAME_None, FGameplayTag::EmptyTag))
+	const bool bImplementsInterface = TargetComponent->GetOwner()->GetClass()->ImplementsInterface(UAbilityForceTarget::StaticClass());
+	if (!bImplementsInterface)
 	{
-		if (!MeshComp || MeshComp->IsSimulatingPhysics())
+		if (!MeshComp || !MeshComp->IsSimulatingPhysics())
 		{
 			return false;
 		}
+	}
+	else if (!IAbilityForceTarget::Execute_CanApplyForceToTarget(TargetComponent->GetOwner(), this, nullptr, TargetComponent, NAME_None, ForceTowardsPathContainer))
+	{
+		return false;
 	}
 
 	FHitResult LOSHitResult;
@@ -145,30 +150,35 @@ bool AAbilityActor_WindPath::ApplyWindForceToObject(float DeltaTime, UPrimitiveC
 	if (TowardPath_WindDirectionDot >= WindPathForceMinimumDot)
 	{
 		const float ForceMagnitudeTowardInnerPath = WindForceTowardsPath * WindPathDistanceRatio;
-		const FVector ForceToApply = ForceTowardSplineVec.GetSafeNormal() * ForceMagnitudeTowardInnerPath * DeltaTime;
-		if (TargetComponent->GetOwner()->GetClass()->ImplementsInterface(UAbilityForceTarget::StaticClass()))
+		FVector ForceToApply = ForceTowardSplineVec.GetSafeNormal() * ForceMagnitudeTowardInnerPath;
+		if (bImplementsInterface)
 		{
-			IAbilityForceTarget::Execute_AddForceToTarget(TargetComponent->GetOwner(), this, nullptr, TargetComponent, ForceToApply, NAME_Name, FGameplayTag::EmptyTag);
+			IAbilityForceTarget::Execute_AddForceToTarget(TargetComponent->GetOwner(), this, nullptr, TargetComponent, ForceToApply, NAME_Name, ForceTowardsPathContainer);
 		}
 		else if (MeshComp)
 		{
-			MeshComp->AddImpulse(ForceToApply, NAME_None, false);
+			ForceToApply *= NonInterfaceForceScalar;
+			MeshComp->AddForce(ForceToApply, NAME_None, false);
 		}
 	}
 
-	const float WindForce = WindForceAlongPath * FMath::Max(.5f, 1.0f - WindPathDistanceRatio);
+	const float WindForce = WindForceAlongPath * FMath::Max(.5f, 1.0f - WindPathDistanceRatio) * (bImplementsInterface ? 1.0f : NonInterfaceForceScalar);
 	// Apply some extra force in the direction of gravity if we're trying to move upward.
 	const float GravityDot = FMath::Max(WindDirectionAtSplinePoint | FVector::UpVector, 0.0f);
-	const FVector GravityForce = FVector::UpVector * GravityDot * GravityForce;
-	const FVector ForceToApply = (GravityForce + (WindDirectionAtSplinePoint * WindForce)) * DeltaTime;
-
-	if (TargetComponent->GetOwner()->GetClass()->ImplementsInterface(UAbilityForceTarget::StaticClass()))
+	FVector GravityForce = FVector::UpVector * GravityDot * GravityForce;
+	if (!bImplementsInterface)
 	{
-		IAbilityForceTarget::Execute_AddForceToTarget(TargetComponent->GetOwner(), this, nullptr, TargetComponent, ForceToApply, NAME_Name, FGameplayTag::EmptyTag);
+		GravityForce *= MeshComp->GetMass();
+	}
+	const FVector ForceToApply = (GravityForce + (WindDirectionAtSplinePoint * WindForce));
+
+	if (bImplementsInterface)
+	{
+		IAbilityForceTarget::Execute_AddForceToTarget(TargetComponent->GetOwner(), this, nullptr, TargetComponent, ForceToApply, NAME_Name, ForceAlongPathContainer);
 	}
 	else if (MeshComp)
 	{
-		MeshComp->AddImpulse(ForceToApply, NAME_None, false);
+		MeshComp->AddForce(ForceToApply, NAME_None, false);
 	}
 
 	return true;

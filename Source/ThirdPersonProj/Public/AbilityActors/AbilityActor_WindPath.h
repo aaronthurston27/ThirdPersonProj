@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/SplineComponent.h"
+#include "GameplayTagContainer.h"
 #include "AbilityActor_WindPath.generated.h"
 
 UCLASS()
@@ -73,9 +74,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Wind Force")
 	float GravityForceMultiplier = 5000.0f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Wind Force")
+	float NonInterfaceForceScalar = 100.0f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Wind Force")
+	FGameplayTagContainer ForceTowardsPathContainer;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Wind Force")
+	FGameplayTagContainer ForceAlongPathContainer;
+
 	void TickWindCollisionPhysics(float DeltaTime);
 
-	bool ApplyWindForceToObject(float DeltaTime, UPrimitiveComponent* SourceComponent, UPrimitiveComponent* TargetComponent, const FVector& ClosestPointToSpline);
+	bool ApplyWindForceToObject(UPrimitiveComponent* SourceComponent, UPrimitiveComponent* TargetComponent, const FVector& ClosestPointToSpline);
 
 public:	
 	// Called every frame

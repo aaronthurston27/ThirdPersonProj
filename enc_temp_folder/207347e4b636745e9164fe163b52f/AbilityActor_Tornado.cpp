@@ -101,7 +101,7 @@ void AAbilityActor_Tornado::CalculateForceVectors(AActor* Actor, UPrimitiveCompo
 
 	const FVector EdgeToCenterVec = ClosestPointToEdge - TornadoCollisionMesh->GetComponentLocation();
 	const FVector TangentialVelocityVec = (FVector::UpVector ^ EdgeToCenterVec).GetSafeNormal();
-	//DrawDebugLine(GetWorld(), ClosestPointToEdge, ClosestPointToEdge + (TangentialVelocityVec * 90.0f), FColor::Red, false, 9.0f, 0, .8f);
+	DrawDebugLine(GetWorld(), ClosestPointToEdge, ClosestPointToEdge + (TangentialVelocityVec * 90.0f), FColor::Red, false, 9.0f, 0, .8f);
 	TangentialForceVector = TangentialVelocityVec * TangentialForce * FMath::Max(1.0f - TornadoCenterDistanceRatio, .2f);
 
 	const float GravityZ = -GetWorld()->GetGravityZ();

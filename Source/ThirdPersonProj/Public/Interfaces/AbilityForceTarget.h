@@ -24,18 +24,18 @@ class THIRDPERSONPROJ_API IAbilityForceTarget
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
-	UFUNCTION(BlueprintNativeEvent)
-	bool CanApplyForceToTarget(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FName& BoneName = FName(TEXT("None")), const FGameplayTagContainer& ForceTagContainer = FGameplayTagContainer::EmptyContainer);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool CanApplyForceToTarget(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FGameplayTagContainer ForceTagContainer, const FName BoneName = FName(TEXT("None")));
 	
-	bool CanApplyForceToTarget_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FName& BoneName = FName(TEXT("None")), const FGameplayTagContainer& ForceTagContainer = FGameplayTagContainer::EmptyContainer);
+	bool CanApplyForceToTarget_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FGameplayTagContainer ForceTagContainer, const FName BoneName = FName(TEXT("None")));
 
-	UFUNCTION(BlueprintNativeEvent)
-	void AddForceToTarget(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Force, const FName& BoneName = FName(TEXT("None")), const FGameplayTagContainer& ForceTagContainer = FGameplayTagContainer::EmptyContainer);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void AddForceToTarget(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Force, const FGameplayTagContainer ForceTagContainer, const FName BoneName = FName(TEXT("None")));
 
-	void AddForceToTarget_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Force, const FName& BoneName, const FGameplayTagContainer& ForceTagContainer = FGameplayTagContainer::EmptyContainer);
+	void AddForceToTarget_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Force, const FGameplayTagContainer ForceTagContainer, const FName BoneName = FName(TEXT("None")));
 
-	UFUNCTION(BlueprintNativeEvent)
-	void AddImpulseToTarget(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Force, const FName& BoneName = FName(TEXT("None")), const FGameplayTagContainer& ForceTagContainer = FGameplayTagContainer::EmptyContainer);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void AddImpulseToTarget(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Force, const FVector& ImpulseLocation, const FGameplayTagContainer ForceTagContainer, const FName BoneName = FName(TEXT("None")));
 
-	void AddImpulseToTarget_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Force, const FName& BoneName, const FGameplayTagContainer& ForceTagContainer = FGameplayTagContainer::EmptyContainer);
+	void AddImpulseToTarget_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Force, const FVector& ImpulseLocation, const FGameplayTagContainer ForceTagContainer, const FName BoneName = FName(TEXT("None")));
 };

@@ -42,7 +42,7 @@ TArray<FHitResult> UTPPFunctionLibrary::GetAllOverlapsWithinCone(const UObject* 
 
 	for (const FHitResult& HitResult : OutHits)
 	{
-		const FVector OriginToHitLocation = HitResult.GetActor()->GetActorLocation() - ConeOrigin;
+		const FVector OriginToHitLocation = HitResult.GetComponent()->GetComponentLocation() - ConeOrigin;
 		if (bDrawDebug)
 		{
 			DrawDebugLine(World, ConeOrigin, HitResult.ImpactPoint, FColor::Yellow, false, 14, 0, .4f);

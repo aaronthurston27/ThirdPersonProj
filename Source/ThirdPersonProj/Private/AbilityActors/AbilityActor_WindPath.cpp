@@ -127,7 +127,7 @@ bool AAbilityActor_WindPath::ApplyWindForceToObject(UPrimitiveComponent* SourceC
 			return false;
 		}
 	}
-	else if (!IAbilityForceTarget::Execute_CanApplyForceToTarget(TargetComponent->GetOwner(), this, nullptr, TargetComponent, NAME_None, ForceTowardsPathContainer))
+	else if (!IAbilityForceTarget::Execute_CanApplyForceToTarget(TargetComponent->GetOwner(), this, nullptr, TargetComponent, ForceTowardsPathContainer, NAME_None))
 	{
 		return false;
 	}
@@ -153,7 +153,7 @@ bool AAbilityActor_WindPath::ApplyWindForceToObject(UPrimitiveComponent* SourceC
 		FVector ForceToApply = ForceTowardSplineVec.GetSafeNormal() * ForceMagnitudeTowardInnerPath;
 		if (bImplementsInterface)
 		{
-			IAbilityForceTarget::Execute_AddForceToTarget(TargetComponent->GetOwner(), this, nullptr, TargetComponent, ForceToApply, NAME_Name, ForceTowardsPathContainer);
+			IAbilityForceTarget::Execute_AddForceToTarget(TargetComponent->GetOwner(), this, nullptr, TargetComponent, ForceToApply, ForceTowardsPathContainer, NAME_None);
 		}
 		else if (MeshComp)
 		{
@@ -174,7 +174,7 @@ bool AAbilityActor_WindPath::ApplyWindForceToObject(UPrimitiveComponent* SourceC
 
 	if (bImplementsInterface)
 	{
-		IAbilityForceTarget::Execute_AddForceToTarget(TargetComponent->GetOwner(), this, nullptr, TargetComponent, ForceToApply, NAME_Name, ForceAlongPathContainer);
+		IAbilityForceTarget::Execute_AddForceToTarget(TargetComponent->GetOwner(), this, nullptr, TargetComponent, ForceToApply,  ForceAlongPathContainer, NAME_None);
 	}
 	else if (MeshComp)
 	{

@@ -81,28 +81,29 @@ void AAbilityActor_Tornado::CalculateForceVectors(AActor* Actor, UPrimitiveCompo
 
 	const FVector ActorToTornadoCenterVec = Comp->GetComponentLocation() - TornadoCollisionMesh->GetComponentLocation();
 	const float TornadoCenterDistanceRatio = FMath::Min(MaxDistanceFromTornadoCenter, ActorToTornadoCenterVec.Size2D()) / MaxDistanceFromTornadoCenter;
+
+	float Radius, Height;
+	TornadoCollisionMesh->CalcBoundingCylinder(Radius, Height);
+	const FVector ClosestPointToEdge = TornadoCollisionMesh->GetComponentLocation() + (ActorToTornadoCenterVec.GetSafeNormal2D() * Radius);
+
+	const FVector EdgeToCenterVec = ClosestPointToEdge - TornadoCollisionMesh->GetComponentLocation();
+	const FVector TangentialVelocityVec = (FVector::UpVector ^ EdgeToCenterVec).GetSafeNormal();
+	TangentialForceVector = TangentialVelocityVec * TangentialForce * FMath::Max(1.0f - TornadoCenterDistanceRatio, .2f);
 	
 	FHitResult LOSHitResult;
 	const FVector TornadoCenterTraceEndLocation = FVector(TornadoCollisionMesh->GetComponentLocation().X, TornadoCollisionMesh->GetComponentLocation().Y, Comp->GetComponentLocation().Z);
 	GetWorld()->LineTraceSingleByObjectType(LOSHitResult, Comp->GetComponentLocation(), TornadoCenterTraceEndLocation, FCollisionObjectQueryParams::AllStaticObjects);
 	if (!LOSHitResult.bBlockingHit)
 	{
-		CentripetalForceVector = -ActorToTornadoCenterVec.GetSafeNormal2D() * TangentialForce * TornadoCenterDistanceRatio * CentripetalForceMultiplier;
+		const FVector ComponentVelocity = Comp->GetComponentVelocity();
+		const float Velocity_TangentDot = ComponentVelocity.GetSafeNormal2D() | TangentialVelocityVec;
+		const FVector TangentialVelocity = ComponentVelocity * FMath::Max(0, Velocity_TangentDot);
+		CentripetalForceVector = -ActorToTornadoCenterVec.GetSafeNormal2D() * TangentialVelocity.Size2D() * FMath::Max(.2f, TornadoCenterDistanceRatio) * CentripetalForceMultiplier;
 	}
 	else
 	{
 		CentripetalForceVector = FVector::ZeroVector;
 	}
-
-	float Radius, Height;
-	TornadoCollisionMesh->CalcBoundingCylinder(Radius, Height);
-	const FVector ClosestPointToEdge = TornadoCollisionMesh->GetComponentLocation() + (ActorToTornadoCenterVec.GetSafeNormal2D() * Radius);
-	//DrawDebugLine(GetWorld(), ClosestPointToEdge, ClosestPointToEdge + TangentialForceVector.GetSafeNormal2D() * 200.0f, FColor::Red, false, 8.0f, 0, .8f);
-
-	const FVector EdgeToCenterVec = ClosestPointToEdge - TornadoCollisionMesh->GetComponentLocation();
-	const FVector TangentialVelocityVec = (FVector::UpVector ^ EdgeToCenterVec).GetSafeNormal();
-	//DrawDebugLine(GetWorld(), ClosestPointToEdge, ClosestPointToEdge + (TangentialVelocityVec * 90.0f), FColor::Red, false, 9.0f, 0, .8f);
-	TangentialForceVector = TangentialVelocityVec * TangentialForce * FMath::Max(1.0f - TornadoCenterDistanceRatio, .2f);
 
 	const float GravityZ = -GetWorld()->GetGravityZ();
 	UpwardForceVector = FVector::UpVector * (GravityZ + UpwardForce);

@@ -30,7 +30,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayTagContainer TangentialForceGameplayTags;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (UIMin = "1.0", ClampMin = "1.0"))
 	float CentripetalForceMultiplier = 1500.0f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (UIMin = "0.1", ClampMin = ".1", UIMax = "1.0", ClampMax = "1.0"))

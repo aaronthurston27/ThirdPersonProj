@@ -75,3 +75,44 @@ TArray<FHitResult> UTPPFunctionLibrary::GetAllOverlapsWithinCone(const UObject* 
 
 	return OverlapsToReturn;
 }
+
+TArray<FHitResult> UTPPFunctionLibrary::GetOverlappingActorsInRadius(const UObject* WorldContextObject, const FVector& Origin, const float Radius, const TArray<AActor*>& IgnoreActors, bool bRequireLOS, bool bDrawDebug)
+{
+	TArray<FHitResult> OverlapsToReturn;
+	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+	if (!World || FMath::IsNearlyZero(Radius))
+	{
+		return OverlapsToReturn;
+	}
+
+	const FCollisionShape SphereCollision = FCollisionShape::MakeSphere(Radius);
+
+	TArray<FHitResult> OutHits;
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActors(IgnoreActors);
+	QueryParams.bFindInitialOverlaps = true;
+	QueryParams.bIgnoreBlocks = true;
+
+	if (bDrawDebug)
+	{
+		DrawDebugSphere(World, Origin, SphereCollision.GetSphereRadius(), 16.0f, FColor::Yellow, false, 14, 0, .3f);
+	}
+	World->SweepMultiByObjectType(OutHits, Origin, Origin, FQuat::Identity, FCollisionObjectQueryParams::AllDynamicObjects, SphereCollision, QueryParams);
+
+	for (const FHitResult& HitResult : OutHits)
+	{
+		if (bRequireLOS)
+		{
+			FHitResult LOSHitResult;
+			World->LineTraceSingleByObjectType(LOSHitResult, Origin, HitResult.ImpactPoint, FCollisionObjectQueryParams::AllStaticObjects, QueryParams);
+			if (LOSHitResult.bBlockingHit)
+			{
+				continue;
+			}
+		}
+
+		OverlapsToReturn.Add(HitResult);
+	}
+
+	return OverlapsToReturn;
+}

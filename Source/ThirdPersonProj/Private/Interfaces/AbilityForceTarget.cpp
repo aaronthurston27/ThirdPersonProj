@@ -18,3 +18,7 @@ void IAbilityForceTarget::AddImpulseToTarget_Implementation(const AActor* ActorS
 {
 
 }
+
+void IAbilityForceTarget::AddRadialImpulseToTarget_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Origin, const FVector& Radius, const float Strength)
+{
+}

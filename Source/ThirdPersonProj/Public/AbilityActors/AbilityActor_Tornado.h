@@ -24,17 +24,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	float TangentialForce = 1500.0f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (UIMin = "0.1", ClampMin = ".1", UIMax = "1.0", ClampMax = "1.0"))
-	float TangentialForceMassPercentage = 1.0f;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayTagContainer TangentialForceGameplayTags;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (UIMin = "1.0", ClampMin = "1.0"))
 	float CentripetalForceMultiplier = 1500.0f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (UIMin = "0.1", ClampMin = ".1", UIMax = "1.0", ClampMax = "1.0"))
-	float CentripetalForceMassPercentage = 1.0f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayTagContainer CentripetalForceGameplayTags;
@@ -51,12 +45,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayTagContainer UpwardForceGameplayTags;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float TorqueForceDegrees = 10.0f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTagContainer TorqueForceGameplayTags;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	void TickTornadoCollisions(float DeltaTime);
 
-	void CalculateForceVectors(AActor* Actor, UPrimitiveComponent* Comp, float DeltaTime, FVector& TangentialForceVector, FVector& CentripetalForce, FVector& UpwardForce);
+	void CalculateForceVectors(AActor* Actor, UPrimitiveComponent* Comp, float DeltaTime, FVector& TangentialForceVector, FVector& CentripetalForce, FVector& UpwardForce, FVector& Torque);
 
 public:	
 	// Called every frame

@@ -43,4 +43,14 @@ public:
 	void AddRadialImpulseToTarget(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Origin, const FVector& Radius, const float Strength);
 
 	void AddRadialImpulseToTarget_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Origin, const FVector& Radius, const float Strength);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void AddAngularImpulseToTarget(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Impulse, const FGameplayTagContainer ForceTagContainer, const FName BoneName = FName(TEXT("None")));
+
+	void AddAngularImpulseToTarget_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Impulse, const FGameplayTagContainer ForceTagContainer, const FName BoneName = FName(TEXT("None")));
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void AddTorqueToTarget_Degrees(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Impulse, const FGameplayTagContainer ForceTagContainer, const FName BoneName = FName(TEXT("None")));
+
+	void  AddTorqueToTarget_Degrees_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Impulse, const FGameplayTagContainer ForceTagContainer, const FName BoneName = FName(TEXT("None")));
 };

@@ -34,7 +34,7 @@ void AAbilityActor_Tornado::TickTornadoCollisions(float DeltaTime)
 	TArray<AActor*> VisitedActors;
 	TornadoCollisionMesh->GetOverlappingComponents(OverlappingComponents);
 
-	FVector TangentialForceVector, CentripetalForceVector, UpwardForceVector;
+	FVector TangentialForceVector, CentripetalForceVector, UpwardForceVector, TorqueVector;
 	for (UPrimitiveComponent* Component : OverlappingComponents)
 	{
 		if (VisitedActors.Contains(Component->GetOwner()))
@@ -47,30 +47,33 @@ void AAbilityActor_Tornado::TickTornadoCollisions(float DeltaTime)
 		{
 			if (IAbilityForceTarget::Execute_CanApplyForceToTarget(Component->GetOwner(), this, TornadoCollisionMesh, Component, FGameplayTagContainer::EmptyContainer, NAME_None))
 			{
-				CalculateForceVectors(Component->GetOwner(), Component, DeltaTime, TangentialForceVector, CentripetalForceVector, UpwardForceVector);
+				CalculateForceVectors(Component->GetOwner(), Component, DeltaTime, TangentialForceVector, CentripetalForceVector, UpwardForceVector, TorqueVector);
 				VisitedActors.Add(Component->GetOwner());
 				IAbilityForceTarget::Execute_AddForceToTarget(Component->GetOwner(), this, TornadoCollisionMesh, Component, TangentialForceVector, TangentialForceGameplayTags, NAME_None);
 				IAbilityForceTarget::Execute_AddForceToTarget(Component->GetOwner(), this, TornadoCollisionMesh, Component, CentripetalForceVector, CentripetalForceGameplayTags, NAME_None);
 				IAbilityForceTarget::Execute_AddForceToTarget(Component->GetOwner(), this, TornadoCollisionMesh, Component, UpwardForceVector, UpwardForceGameplayTags, NAME_None);
+				IAbilityForceTarget::Execute_AddTorqueToTarget_Degrees(Component->GetOwner(), this, TornadoCollisionMesh, Component, TorqueVector, TorqueForceGameplayTags, NAME_None);
 			}
 		}
 		else if (UMeshComponent* MeshComp = Cast<UMeshComponent>(Component))
 		{
 			if (MeshComp->IsSimulatingPhysics())
 			{
-				CalculateForceVectors(Component->GetOwner(), Component, DeltaTime, TangentialForceVector, CentripetalForceVector, UpwardForceVector);
+				CalculateForceVectors(Component->GetOwner(), Component, DeltaTime, TangentialForceVector, CentripetalForceVector, UpwardForceVector, TorqueVector);
+				const float MeshMass = MeshComp->GetMass();
 				// Add mass to offset gravity acceleration.
-				UpwardForceVector.Z *= MeshComp->GetMass();
+				UpwardForceVector.Z *= MeshMass;
 				VisitedActors.Add(Component->GetOwner());
-				MeshComp->AddForce(TangentialForceVector * FMath::Max(1.0f, MeshComp->GetMass() * TangentialForceMassPercentage));
-				MeshComp->AddForce(CentripetalForceVector * FMath::Max(1.0f, MeshComp->GetMass() * CentripetalForceMassPercentage));
+				MeshComp->AddForce(TangentialForceVector * MeshMass);
+				MeshComp->AddForce(CentripetalForceVector * MeshMass);
 				MeshComp->AddForce(UpwardForceVector * NonInterfaceGravityScale, NAME_None, false);
+				MeshComp->AddTorqueInDegrees(TorqueVector * MeshMass, NAME_None, true);
 			}
 		}	
 	}
 }
 
-void AAbilityActor_Tornado::CalculateForceVectors(AActor* Actor, UPrimitiveComponent* Comp, float DeltaTime, FVector& TangentialForceVector, FVector& CentripetalForceVector, FVector& UpwardForceVector)
+void AAbilityActor_Tornado::CalculateForceVectors(AActor* Actor, UPrimitiveComponent* Comp, float DeltaTime, FVector& TangentialForceVector, FVector& CentripetalForceVector, FVector& UpwardForceVector, FVector& Torque)
 {
 	check(Actor);
 	check(Comp);
@@ -107,5 +110,7 @@ void AAbilityActor_Tornado::CalculateForceVectors(AActor* Actor, UPrimitiveCompo
 
 	const float GravityZ = -GetWorld()->GetGravityZ();
 	UpwardForceVector = FVector::UpVector * (GravityZ + UpwardForce);
+
+	Torque = FVector::UpVector * TorqueForceDegrees;
 }
 

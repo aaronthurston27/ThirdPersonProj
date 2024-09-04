@@ -22,3 +22,11 @@ void IAbilityForceTarget::AddImpulseToTarget_Implementation(const AActor* ActorS
 void IAbilityForceTarget::AddRadialImpulseToTarget_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Origin, const FVector& Radius, const float Strength)
 {
 }
+
+void IAbilityForceTarget::AddAngularImpulseToTarget_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Impulse, const FGameplayTagContainer ForceTagContainer, const FName BoneName)
+{
+}
+
+void IAbilityForceTarget::AddTorqueToTarget_Degrees_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Impulse, const FGameplayTagContainer ForceTagContainer, const FName BoneName)
+{
+}

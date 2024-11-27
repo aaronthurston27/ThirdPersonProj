@@ -127,10 +127,6 @@ bool AAbilityActor_WindPath::ApplyWindForceToObject(UPrimitiveComponent* SourceC
 			return false;
 		}
 	}
-	else if (!IAbilityForceTarget::Execute_CanApplyForceToTarget(TargetComponent->GetOwner(), this, nullptr, TargetComponent, ForceTowardsPathContainer, NAME_None))
-	{
-		return false;
-	}
 
 	FHitResult LOSHitResult;
 	GetWorld()->LineTraceSingleByObjectType(LOSHitResult, TargetComponent->GetComponentLocation(), ClosestPointToSpline, FCollisionObjectQueryParams::AllStaticObjects);
@@ -153,7 +149,7 @@ bool AAbilityActor_WindPath::ApplyWindForceToObject(UPrimitiveComponent* SourceC
 		FVector ForceToApply = ForceTowardSplineVec.GetSafeNormal() * ForceMagnitudeTowardInnerPath;
 		if (bImplementsInterface)
 		{
-			IAbilityForceTarget::Execute_AddForceToTarget(TargetComponent->GetOwner(), this, nullptr, TargetComponent, ForceToApply, ForceTowardsPathContainer, NAME_None);
+			IAbilityForceTarget::Execute_ReceiveForce(TargetComponent->GetOwner(), this, nullptr, TargetComponent, ForceToApply, ForceTowardsPathContainer, NAME_None);
 		}
 		else if (MeshComp)
 		{
@@ -174,7 +170,7 @@ bool AAbilityActor_WindPath::ApplyWindForceToObject(UPrimitiveComponent* SourceC
 
 	if (bImplementsInterface)
 	{
-		IAbilityForceTarget::Execute_AddForceToTarget(TargetComponent->GetOwner(), this, nullptr, TargetComponent, ForceToApply,  ForceAlongPathContainer, NAME_None);
+		IAbilityForceTarget::Execute_ReceiveForce(TargetComponent->GetOwner(), this, nullptr, TargetComponent, ForceToApply,  ForceAlongPathContainer, NAME_None);
 	}
 	else if (MeshComp)
 	{

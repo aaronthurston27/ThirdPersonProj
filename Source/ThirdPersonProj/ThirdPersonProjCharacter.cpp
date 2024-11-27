@@ -103,6 +103,11 @@ void AThirdPersonProjCharacter::OnJumped_Implementation()
 	OnJumpedEvent.Broadcast();
 }
 
+void AThirdPersonProjCharacter::ReceiveForce_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Force, const FGameplayTagContainer ForceTagContainer, const FName BoneName)
+{
+	OnReceiveForce.Broadcast(SourceComponent, Force, ForceTagContainer, BoneName);
+}
+
 FVector2D AThirdPersonProjCharacter::GetDesiredMovementVector_Implementation() const
 {
 	return GetLastRawInputVector();
@@ -201,13 +206,12 @@ void AThirdPersonProjCharacter::OnWalkPressed(const FInputActionValue& Value)
 
 void AThirdPersonProjCharacter::OnWalkReleased(const FInputActionValue& Value)
 {
-	/*
+	
 	UTPPMovementComponent* MoveComp = GetThirdPersonMovementComponent();
 	if (MoveComp)
 	{
 		MoveComp->SetWantsToWalk(false);
 	}
-	*/
 }
 
 void AThirdPersonProjCharacter::OnRunPressed(const FInputActionValue& Value)
@@ -215,8 +219,7 @@ void AThirdPersonProjCharacter::OnRunPressed(const FInputActionValue& Value)
 	UTPPMovementComponent* MoveComp = GetThirdPersonMovementComponent();
 	if (MoveComp)
 	{
-		MoveComp->SetWantsToRun(true);
-		MoveComp->SetWantsToWalk(false);
+		MoveComp->SetWantsToRun(!MoveComp->DoesCharacterWantToRun());
 	}
 }
 

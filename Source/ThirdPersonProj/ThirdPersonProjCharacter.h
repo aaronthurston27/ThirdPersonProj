@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "AbilitySystemComponent.h"
+#include "Interfaces/AbilityForceTarget.h"
 #include "ThirdPersonProjCharacter.generated.h"
 
 class USpringArmComponent;
@@ -22,7 +23,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnJumped);
 
 UCLASS(config=Game)
-class AThirdPersonProjCharacter : public ACharacter
+class AThirdPersonProjCharacter : public ACharacter, public IAbilityForceTarget
 {
 	GENERATED_BODY()
 
@@ -151,5 +152,12 @@ protected:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnJumped OnJumpedEvent;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnTryAddForceToOwner OnReceiveForce;
+
+protected:
+
+	void ReceiveForce_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Force, const FGameplayTagContainer ForceTagContainer, const FName BoneName = FName(TEXT("None"))) override;
 };
 

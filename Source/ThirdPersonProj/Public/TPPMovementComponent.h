@@ -28,6 +28,9 @@ protected:
 	UPROPERTY(Transient, BlueprintReadOnly)
 	bool bWantsToWalk = false;
 
+	UPROPERTY(Transient, BlueprintReadOnly)
+	bool bIsGliding = false;
+
 public:
 
 	UFUNCTION(BlueprintCallable)
@@ -41,5 +44,11 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	bool DoesCharacterWantToWalk() const { return bWantsToWalk; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetIsGliding(bool bNewIsGliding);
+
+	UFUNCTION(BlueprintPure)
+	bool IsGliding() const { return IsFalling() && bIsGliding; }
 	
 };

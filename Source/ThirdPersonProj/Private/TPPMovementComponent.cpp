@@ -56,3 +56,8 @@ void UTPPMovementComponent::SetWantsToWalk(bool bNewWantsToWalk)
 		SetWantsToRun(false);
 	}
 }
+
+void UTPPMovementComponent::SetIsGliding(bool bNewIsGliding)
+{
+	bIsGliding = bNewIsGliding;
+}

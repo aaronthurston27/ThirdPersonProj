@@ -45,15 +45,12 @@ void AAbilityActor_Tornado::TickTornadoCollisions(float DeltaTime)
 		IAbilityForceTarget* ForceTarget = Cast<IAbilityForceTarget>(Component->GetOwner());
 		if (Component->GetOwner()->GetClass()->ImplementsInterface(UAbilityForceTarget::StaticClass()))
 		{
-			if (IAbilityForceTarget::Execute_CanApplyForceToTarget(Component->GetOwner(), this, TornadoCollisionMesh, Component, FGameplayTagContainer::EmptyContainer, NAME_None))
-			{
-				CalculateForceVectors(Component->GetOwner(), Component, DeltaTime, TangentialForceVector, CentripetalForceVector, UpwardForceVector, TorqueVector);
-				VisitedActors.Add(Component->GetOwner());
-				IAbilityForceTarget::Execute_AddForceToTarget(Component->GetOwner(), this, TornadoCollisionMesh, Component, TangentialForceVector, TangentialForceGameplayTags, NAME_None);
-				IAbilityForceTarget::Execute_AddForceToTarget(Component->GetOwner(), this, TornadoCollisionMesh, Component, CentripetalForceVector, CentripetalForceGameplayTags, NAME_None);
-				IAbilityForceTarget::Execute_AddForceToTarget(Component->GetOwner(), this, TornadoCollisionMesh, Component, UpwardForceVector, UpwardForceGameplayTags, NAME_None);
-				IAbilityForceTarget::Execute_AddTorqueToTarget_Degrees(Component->GetOwner(), this, TornadoCollisionMesh, Component, TorqueVector, TorqueForceGameplayTags, NAME_None);
-			}
+			CalculateForceVectors(Component->GetOwner(), Component, DeltaTime, TangentialForceVector, CentripetalForceVector, UpwardForceVector, TorqueVector);
+			VisitedActors.Add(Component->GetOwner());
+			IAbilityForceTarget::Execute_ReceiveForce(Component->GetOwner(), this, TornadoCollisionMesh, Component, TangentialForceVector, TangentialForceGameplayTags, NAME_None);
+			IAbilityForceTarget::Execute_ReceiveForce(Component->GetOwner(), this, TornadoCollisionMesh, Component, CentripetalForceVector, CentripetalForceGameplayTags, NAME_None);
+			IAbilityForceTarget::Execute_ReceiveForce(Component->GetOwner(), this, TornadoCollisionMesh, Component, UpwardForceVector, UpwardForceGameplayTags, NAME_None);
+			IAbilityForceTarget::Execute_ReceiveTorque_Degrees(Component->GetOwner(), this, TornadoCollisionMesh, Component, TorqueVector, TorqueForceGameplayTags, NAME_None);
 		}
 		else if (UMeshComponent* MeshComp = Cast<UMeshComponent>(Component))
 		{

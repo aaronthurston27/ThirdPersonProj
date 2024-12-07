@@ -51,10 +51,16 @@ protected:
 	FGameplayAbilitySpecHandle ActiveSecondaryAbilityHandle;
 
 	UPROPERTY(Transient)
+	FGameplayAbilitySpecHandle ActiveAuxiliaryAbilityHandle;
+
+	UPROPERTY(Transient)
 	TArray<FGameplayAbilitySpecHandle> PrimaryAbilityHandles;
 
 	UPROPERTY(Transient)
 	TArray<FGameplayAbilitySpecHandle> SecondaryAbilityHandles;
+
+	UPROPERTY(Transient)
+	TArray<FGameplayAbilitySpecHandle> AuxiliaryAbilityHandles;
 
 	UPROPERTY(Transient)
 	TArray<FGameplayAbilitySpecHandle> PassiveAbilityHandles;
@@ -79,14 +85,22 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetActiveSecondaryAbility(const FGameplayAbilitySpecHandle& SpecHandle);
 
+	UFUNCTION(BlueprintCallable)
+	void SetActiveAuxiliaryAbility(const FGameplayAbilitySpecHandle& SpecHandle);
+
 	UFUNCTION(BlueprintPure)
 	bool IsPrimaryAbilityActive() const;
 
 	UFUNCTION(BlueprintPure)
 	bool IsSecondaryAbilityActive() const;
 
+	UFUNCTION(BlueprintPure)
+	bool IsAuxiliaryAbilityActive() const;
+
 	void SelectNextPrimaryAbility();
 
 	void SelectNextSecondaryAbility();
+
+	void SelectNextAuxiliaryAbility();
 		
 };

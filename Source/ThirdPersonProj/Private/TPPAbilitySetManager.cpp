@@ -55,6 +55,7 @@ void UTPPAbilitySetManager::SetActiveAbilitySet(UTPPAbilitySet* NewAbilitySet)
 		TArray<FGameplayAbilitySpecHandle> AllHandles;
 		AllHandles.Append(PrimaryAbilityHandles);
 		AllHandles.Append(SecondaryAbilityHandles);
+		AllHandles.Append(AuxiliaryAbilityHandles);
 		AllHandles.Append(PassiveAbilityHandles);
 		AllHandles.Add(UltimateAbilityHandle);
 		AllHandles.Add(JumpAbilityHandle);
@@ -67,6 +68,7 @@ void UTPPAbilitySetManager::SetActiveAbilitySet(UTPPAbilitySet* NewAbilitySet)
 
 		PrimaryAbilityHandles.Empty();
 		SecondaryAbilityHandles.Empty();
+		AuxiliaryAbilityHandles.Empty();
 		PassiveAbilityHandles.Empty();
 		JumpAbilityHandle = FGameplayAbilitySpecHandle();
 		MeleeAbilityHandle = FGameplayAbilitySpecHandle();
@@ -78,7 +80,7 @@ void UTPPAbilitySetManager::SetActiveAbilitySet(UTPPAbilitySet* NewAbilitySet)
 	if (ActiveAbilitySet)
 	{
 		TArray<FGameplayAbilitySpecHandle> Passives;
-		ActiveAbilitySet->GiveAbilities_ReturnHandles(CachedAbilitySystem, PrimaryAbilityHandles, SecondaryAbilityHandles, Passives, JumpAbilityHandle, MeleeAbilityHandle, UltimateAbilityHandle);
+		ActiveAbilitySet->GiveAbilities_ReturnHandles(CachedAbilitySystem, PrimaryAbilityHandles, SecondaryAbilityHandles, AuxiliaryAbilityHandles, Passives, JumpAbilityHandle, MeleeAbilityHandle, UltimateAbilityHandle);
 
 		if (PrimaryAbilityHandles.Num() > 0)
 		{
@@ -88,6 +90,11 @@ void UTPPAbilitySetManager::SetActiveAbilitySet(UTPPAbilitySet* NewAbilitySet)
 		if (SecondaryAbilityHandles.Num() > 0)
 		{
 			SetActiveSecondaryAbility(SecondaryAbilityHandles[0]);
+		}
+
+		if (AuxiliaryAbilityHandles.Num() > 0)
+		{
+			SetActiveAuxiliaryAbility(AuxiliaryAbilityHandles[0]);
 		}
 	}
 }
@@ -158,6 +165,39 @@ void UTPPAbilitySetManager::SetActiveSecondaryAbility(const FGameplayAbilitySpec
 	}
 }
 
+void UTPPAbilitySetManager::SetActiveAuxiliaryAbility(const FGameplayAbilitySpecHandle& SpecHandle)
+{
+	check(CachedAbilitySystem);
+
+	if (!ensure(AuxiliaryAbilityHandles.Contains(SpecHandle)))
+	{
+		return;
+	}
+
+	if (ActiveAuxiliaryAbilityHandle.IsValid())
+	{
+		UTPPAbility* CurrentAuxiliaryAbility = Cast<UTPPAbility>(CachedAbilitySystem->FindAbilitySpecFromHandle(ActiveAuxiliaryAbilityHandle)->GetPrimaryInstance());
+		if (CurrentAuxiliaryAbility)
+		{
+			CurrentAuxiliaryAbility->OnAbilityUnequipped();
+		}
+	}
+
+	ActiveAuxiliaryAbilityHandle = SpecHandle;
+
+	const FGameplayAbilitySpec* AuxiliaryAbilitySpec = CachedAbilitySystem->FindAbilitySpecFromHandle(SpecHandle);
+	UTPPAbility* TPPAbility = AuxiliaryAbilitySpec ? Cast<UTPPAbility>(AuxiliaryAbilitySpec->GetPrimaryInstance()) : nullptr;
+	if (TPPAbility)
+	{
+		TPPAbility->OnAbilityEquipped();
+
+		if (TPPAbility->ShouldAbilityActivateOnEquip())
+		{
+			CachedAbilitySystem->TryActivateAbility(SpecHandle);
+		}
+	}
+}
+
 bool UTPPAbilitySetManager::IsPrimaryAbilityActive() const
 {
 	if (!CachedAbilitySystem)
@@ -178,6 +218,17 @@ bool UTPPAbilitySetManager::IsSecondaryAbilityActive() const
 
 	const FGameplayAbilitySpec* SecondaryAbilitySpec = CachedAbilitySystem->FindAbilitySpecFromHandle(ActiveSecondaryAbilityHandle);
 	return SecondaryAbilitySpec ? SecondaryAbilitySpec->IsActive() : false;
+}
+
+bool UTPPAbilitySetManager::IsAuxiliaryAbilityActive() const
+{
+	if (!CachedAbilitySystem)
+	{
+		return false;
+	}
+
+	const FGameplayAbilitySpec* AuxiliaryAbilitySpec = CachedAbilitySystem->FindAbilitySpecFromHandle(ActiveAuxiliaryAbilityHandle);
+	return AuxiliaryAbilitySpec ? AuxiliaryAbilitySpec->IsActive() : false;
 }
 
 void UTPPAbilitySetManager::SelectNextPrimaryAbility()
@@ -201,5 +252,17 @@ void UTPPAbilitySetManager::SelectNextSecondaryAbility()
 	if (SecondaryAbilityHandles.IsValidIndex(NextAbilityIndex))
 	{
 		SetActiveSecondaryAbility(SecondaryAbilityHandles[NextAbilityIndex]);
+	}
+}
+
+void UTPPAbilitySetManager::SelectNextAuxiliaryAbility()
+{
+	int32 CurrentAuxiliaryAbilityIndex = -1;
+	CurrentAuxiliaryAbilityIndex = AuxiliaryAbilityHandles.Find(ActiveAuxiliaryAbilityHandle);
+
+	const int32 NextAbilityIndex = (CurrentAuxiliaryAbilityIndex + 1) % AuxiliaryAbilityHandles.Num();
+	if (AuxiliaryAbilityHandles.IsValidIndex(NextAbilityIndex))
+	{
+		SetActiveAuxiliaryAbility(AuxiliaryAbilityHandles[NextAbilityIndex]);
 	}
 }

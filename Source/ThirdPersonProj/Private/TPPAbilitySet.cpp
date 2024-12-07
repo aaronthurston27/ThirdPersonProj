@@ -4,8 +4,7 @@
 #include "TPPAbilitySet.h"
 #include "AbilitySystemComponent.h"
 
-void UTPPAbilitySet::GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& PrimarySpecHandles, TArray<FGameplayAbilitySpecHandle>& SecondarySpecHandles, 
-	TArray<FGameplayAbilitySpecHandle>& PassiveAbilityHandles, FGameplayAbilitySpecHandle& JumpAbilityHandle, FGameplayAbilitySpecHandle& MeleeAbilityHandle, FGameplayAbilitySpecHandle& UltimateAbilityHandle) const
+void UTPPAbilitySet::GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& PrimarySpecHandles, TArray<FGameplayAbilitySpecHandle>& SecondarySpecHandles, TArray<FGameplayAbilitySpecHandle>& AuxiliarySpecHandles, TArray<FGameplayAbilitySpecHandle>& PassiveAbilityHandles, FGameplayAbilitySpecHandle& JumpAbilityHandle, FGameplayAbilitySpecHandle& MeleeAbilityHandle, FGameplayAbilitySpecHandle& UltimateAbilityHandle) const
 {
 	for (const FGameplayAbilityBindInfo& BindInfo : Abilities)
 	{
@@ -27,6 +26,18 @@ void UTPPAbilitySet::GiveAbilities_ReturnHandles(UAbilitySystemComponent* Abilit
 			if (SecondaryHandle.IsValid())
 			{
 				SecondarySpecHandles.Add(SecondaryHandle);
+			}
+		}
+	}
+
+	for (const FGameplayAbilityBindInfo& BindInfo : AuxiliaryAbilities)
+	{
+		if (BindInfo.GameplayAbilityClass)
+		{
+			const FGameplayAbilitySpecHandle AuxiliaryHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(BindInfo.GameplayAbilityClass, 1, (int32)BindInfo.Command));
+			if (AuxiliaryHandle.IsValid())
+			{
+				AuxiliarySpecHandles.Add(AuxiliaryHandle);
 			}
 		}
 	}

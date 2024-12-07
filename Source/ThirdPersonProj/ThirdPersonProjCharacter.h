@@ -99,9 +99,9 @@ protected:
 
 	void OnRunReleased(const FInputActionValue& Value);
 
-	void OnCyclePrimaryAbilityPressed(const FInputActionValue& Value);
-
 	void OnCycleSecondaryAbilityPressed(const FInputActionValue& Value);
+
+	void OnCycleAuxiliaryAbilityPressed(const FInputActionValue& Value);
 			
 protected:
 	// APawn interface

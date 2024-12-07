@@ -146,7 +146,7 @@ void AThirdPersonProjCharacter::SetupPlayerInputComponent(UInputComponent* Playe
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Started, this, &AThirdPersonProjCharacter::OnRunPressed);
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &AThirdPersonProjCharacter::OnRunReleased);
 
-		EnhancedInputComponent->BindAction(CyclePrimaryAbilityAction, ETriggerEvent::Started, this, &AThirdPersonProjCharacter::OnCyclePrimaryAbilityPressed);
+		EnhancedInputComponent->BindAction(CyclePrimaryAbilityAction, ETriggerEvent::Started, this, &AThirdPersonProjCharacter::OnCycleSecondaryAbilityPressed);
 		EnhancedInputComponent->BindAction(CycleSecondaryAbilityAction, ETriggerEvent::Started, this, &AThirdPersonProjCharacter::OnCycleSecondaryAbilityPressed);
 	}
 	else
@@ -232,19 +232,19 @@ void AThirdPersonProjCharacter::OnRunReleased(const FInputActionValue& Value)
 	}
 }
 
-void AThirdPersonProjCharacter::OnCyclePrimaryAbilityPressed(const FInputActionValue& Value)
-{
-	if (AbilitySetManager)
-	{
-		AbilitySetManager->SelectNextPrimaryAbility();
-	}
-}
-
 void AThirdPersonProjCharacter::OnCycleSecondaryAbilityPressed(const FInputActionValue& Value)
 {
 	if (AbilitySetManager)
 	{
 		AbilitySetManager->SelectNextSecondaryAbility();
+	}
+}
+
+void AThirdPersonProjCharacter::OnCycleAuxiliaryAbilityPressed(const FInputActionValue& Value)
+{
+	if (AbilitySetManager)
+	{
+		AbilitySetManager->SelectNextAuxiliaryAbility();
 	}
 }
 

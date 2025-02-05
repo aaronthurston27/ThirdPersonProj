@@ -36,6 +36,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = AbilitySet)
 	FGameplayAbilityBindInfo MeleeAbility;
 
+	void GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& Handles);
+
 	virtual void GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& PrimarySpecHandles, TArray<FGameplayAbilitySpecHandle>& SecondarySpecHandles, TArray<FGameplayAbilitySpecHandle>& AuxiliarySpecHandles, TArray<FGameplayAbilitySpecHandle>& PassiveAbilityHandles, 
 		FGameplayAbilitySpecHandle& JumpAbilityHandle, FGameplayAbilitySpecHandle& MeleeAbilityHandle, FGameplayAbilitySpecHandle& UltimateAbilityHandle) const;
 	

@@ -157,6 +157,14 @@ void UTPPAbilitySystemComponent::CancelAbilitiesByTag(const FGameplayTagContaine
 	CancelAbilities(&TagContainer);
 }
 
+void UTPPAbilitySystemComponent::ClearAbilities(const TArray<FGameplayAbilitySpecHandle>& Abilities)
+{
+	for (const FGameplayAbilitySpecHandle& SpecHandle : Abilities)
+	{
+		ClearAbility(SpecHandle);
+	}
+}
+
 void UTPPAbilitySystemComponent::HandleAnyGameplayTagCountChanged(const FGameplayTag Tag, int32 Count)
 {
 	if (!Tag.MatchesTag(BaseGameplayTag))

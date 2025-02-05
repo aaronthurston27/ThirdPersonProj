@@ -12,6 +12,7 @@
 #include "InputActionValue.h"
 #include "TPPMovementComponent.h"
 #include "TPPAbilitySystemComponent.h"
+#include "Items/TPPEquipmentComponent.h"
 #include "TPPAbilitySetManager.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -57,6 +58,8 @@ AThirdPersonProjCharacter::AThirdPersonProjCharacter()
 
 	TPPAbilitySystemComponent = CreateDefaultSubobject<UTPPAbilitySystemComponent>(TEXT("Ability System Component"));
 	AbilitySetManager = CreateDefaultSubobject<UTPPAbilitySetManager>(TEXT("Ability Set Manager"));
+
+	EquipmentComponent = CreateDefaultSubobject<UTPPEquipmentComponent>(TEXT("Equipment Component"));
 }
 
 void AThirdPersonProjCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue, bool bForce)

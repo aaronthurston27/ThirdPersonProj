@@ -7,6 +7,7 @@
 #include "Logging/LogMacros.h"
 #include "AbilitySystemComponent.h"
 #include "Interfaces/AbilityForceTarget.h"
+#include "AbilitySystemInterface.h"
 #include "ThirdPersonProjCharacter.generated.h"
 
 class USpringArmComponent;
@@ -17,13 +18,14 @@ struct FInputActionValue;
 class UTPPMovementComponent;
 class UTPPAbilitySystemComponent;
 class UTPPAbilitySetManager;
+class UTPPEquipmentComponent;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnJumped);
 
 UCLASS(config=Game)
-class AThirdPersonProjCharacter : public ACharacter, public IAbilityForceTarget
+class AThirdPersonProjCharacter : public ACharacter, public IAbilityForceTarget, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -71,6 +73,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Transient, BlueprintReadOnly)
 	UTPPAbilitySystemComponent* TPPAbilitySystemComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory, meta = (AllowPrivat = "true"))
+	UTPPEquipmentComponent* EquipmentComponent;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities")
 	UTPPAbilitySetManager* AbilitySetManager;
 
@@ -81,6 +86,8 @@ public:
 	virtual void AddMovementInput(FVector WorldDirection, float ScaleValue = 1.0f, bool bForce = false) override;
 	;
 	void ConsumeRawInputVector();
+
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return Cast<UAbilitySystemComponent>(TPPAbilitySystemComponent); }
 	
 
 protected:
@@ -117,7 +124,7 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	UFUNCTION(BlueprintPure)
-	UTPPAbilitySystemComponent* GetAbilitySystemComponent() const { return TPPAbilitySystemComponent; }
+	UTPPAbilitySystemComponent* GetTPPAbilitySystemComponent() const { return TPPAbilitySystemComponent; }
 
 protected:
 

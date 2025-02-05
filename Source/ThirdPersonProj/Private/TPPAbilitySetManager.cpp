@@ -24,7 +24,7 @@ void UTPPAbilitySetManager::BeginPlay()
 	CharacterOwner = Cast<AThirdPersonProjCharacter>(GetOwner());
 	if (CharacterOwner)
 	{
-		CachedAbilitySystem = CharacterOwner->GetAbilitySystemComponent();
+		CachedAbilitySystem = CharacterOwner->GetTPPAbilitySystemComponent();
 	}
 
 	ensure(CharacterOwner);

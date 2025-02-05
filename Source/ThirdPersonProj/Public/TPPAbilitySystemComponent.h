@@ -55,6 +55,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void CancelAbilitiesByTag(const FGameplayTagContainer& TagContainer);
 
+	void ClearAbilities(const TArray<FGameplayAbilitySpecHandle>& Abilities);
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

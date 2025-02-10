@@ -43,7 +43,7 @@ void UTPPAbilitySetManager::TickComponent(float DeltaTime, ELevelTick TickType, 
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UTPPAbilitySetManager::SetActiveAbilitySet(UTPPAbilitySet* NewAbilitySet)
+void UTPPAbilitySetManager::SetActiveAbilitySet(UTPPAbilitySet_Character* NewAbilitySet)
 {
 	if (!CachedAbilitySystem)
 	{

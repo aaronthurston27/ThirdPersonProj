@@ -7,7 +7,7 @@
 #include "GameplayAbilitySpecHandle.h"
 #include "TPPAbilitySetManager.generated.h"
 
-class UTPPAbilitySet;
+class UTPPAbilitySet_Character;
 class UTPPAbility;
 class AThirdPersonProjCharacter;
 class UTPPAbilitySystemComponent;
@@ -39,10 +39,10 @@ protected:
 	UTPPAbilitySystemComponent* CachedAbilitySystem = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TArray<UTPPAbilitySet*> AvailableAbilitySets;
+	TArray<UTPPAbilitySet_Character*> AvailableAbilitySets;
 
 	UPROPERTY(Transient)
-	UTPPAbilitySet* ActiveAbilitySet = nullptr;
+	UTPPAbilitySet_Character* ActiveAbilitySet = nullptr;
 
 	UPROPERTY(Transient)
 	FGameplayAbilitySpecHandle ActivePrimaryAbilityHandle;
@@ -77,7 +77,7 @@ protected:
 public:
 
 	UFUNCTION(BlueprintCallable)
-	void SetActiveAbilitySet(UTPPAbilitySet* NewAbilitySet);
+	void SetActiveAbilitySet(UTPPAbilitySet_Character* NewAbilitySet);
 
 	UFUNCTION(BlueprintCallable)
 	void SetActivePrimaryAbility(const FGameplayAbilitySpecHandle& SpecHandle);

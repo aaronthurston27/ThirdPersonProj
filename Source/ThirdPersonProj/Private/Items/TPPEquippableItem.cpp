@@ -3,7 +3,7 @@
 
 #include "Items/TPPEquippableItem.h"
 #include "AbilitySystemInterface.h"
-#include "TPPAbilitySet.h"
+#include "Abilities/TPPEquipmentAbility.h"
 #include "TPPAbilitySystemComponent.h"
 #include "ThirdPersonProj/ThirdPersonProjCharacter.h"
 #include "Items/TPPEquipmentComponent.h"
@@ -153,6 +153,11 @@ UAbilitySystemComponent* ATPPEquippableItem::GetOwnerAbilitySystem() const
 	return TPPCharacter ? TPPCharacter->GetAbilitySystemComponent() : nullptr;
 }
 
+EEquippableState ATPPEquippableItem::GetEquippableState() const
+{
+	return EquipState;
+}
+
 void ATPPEquippableItem::BeginEquip()
 {
 	SetEquipState(EEquippableState::Equipped);
@@ -235,7 +240,7 @@ void ATPPEquippableItem::OnEquipStateChanged(EEquippableState PrevState, EEquipp
 
 void ATPPEquippableItem::DetachMesh()
 {
-	SkeletalMesh->DetachFromParent(true);
+	SkeletalMesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 }
 
 void ATPPEquippableItem::AttachToOwner(const FName& SocketName)
@@ -257,7 +262,7 @@ void ATPPEquippableItem::GrantEquippableAbilities()
 
 	if (AbilitiesToGrant.IsValid())
 	{
-		AbilitiesToGrant.Get()->GiveAbilities_ReturnHandles(AbilitySystemComp, GrantedAbilities);
+		AbilitiesToGrant.Get()->GiveAbilities_ReturnHandles(AbilitySystemComp, this, GrantedAbilities);
 	}
 
 }

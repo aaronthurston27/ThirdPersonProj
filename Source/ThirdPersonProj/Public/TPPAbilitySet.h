@@ -18,27 +18,34 @@ class THIRDPERSONPROJ_API UTPPAbilitySet : public UGameplayAbilitySet
 
 public:
 
-	UPROPERTY(EditAnywhere, Category = AbilitySet)
+	void GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, UObject* SourceObject, TArray<FGameplayAbilitySpecHandle>& Handles);
+};
+
+
+UCLASS(Blueprintable, BlueprintType)
+class THIRDPERSONPROJ_API UTPPAbilitySet_Character : public UTPPAbilitySet
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, Category = AbilitySet, meta = (DisplayAfter = "Abilities"))
 	TArray<FGameplayAbilityBindInfo> SecondaryAbilities;
 
-	UPROPERTY(EditAnywhere, Category = AbilitySet)
+	UPROPERTY(EditAnywhere, Category = AbilitySet, meta = (DisplayAfter = "Abilities"))
 	TArray<FGameplayAbilityBindInfo> AuxiliaryAbilities;
 
-	UPROPERTY(EditAnywhere, Category = AbilitySet)
+	UPROPERTY(EditAnywhere, Category = AbilitySet, meta = (DisplayAfter = "Abilities"))
 	FGameplayAbilityBindInfo UltimateAbility;
 
-	UPROPERTY(EditAnywhere, Category = AbilitySet)
-	TArray <TSubclassOf<UGameplayAbility>> PassiveAbilities;
-
-	UPROPERTY(EditAnywhere, Category = AbilitySet)
+	UPROPERTY(EditAnywhere, Category = AbilitySet, meta = (DisplayAfter = "Abilities"))
 	FGameplayAbilityBindInfo JumpAbility;
 
-	UPROPERTY(EditAnywhere, Category = AbilitySet)
+	UPROPERTY(EditAnywhere, Category = AbilitySet, meta = (DisplayAfter = "Abilities"))
 	FGameplayAbilityBindInfo MeleeAbility;
 
-	void GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& Handles);
+	UPROPERTY(EditAnywhere, Category = AbilitySet, meta = (DisplayAfter = "Abilities"))
+	TArray <TSubclassOf<UGameplayAbility>> PassiveAbilities;
 
-	virtual void GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& PrimarySpecHandles, TArray<FGameplayAbilitySpecHandle>& SecondarySpecHandles, TArray<FGameplayAbilitySpecHandle>& AuxiliarySpecHandles, TArray<FGameplayAbilitySpecHandle>& PassiveAbilityHandles, 
+	void GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& PrimarySpecHandles, TArray<FGameplayAbilitySpecHandle>& SecondarySpecHandles, TArray<FGameplayAbilitySpecHandle>& AuxiliarySpecHandles, TArray<FGameplayAbilitySpecHandle>& PassiveAbilityHandles,
 		FGameplayAbilitySpecHandle& JumpAbilityHandle, FGameplayAbilitySpecHandle& MeleeAbilityHandle, FGameplayAbilitySpecHandle& UltimateAbilityHandle) const;
-	
 };

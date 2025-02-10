@@ -11,7 +11,6 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "TPPMovementComponent.h"
-#include "TPPAbilitySystemComponent.h"
 #include "Items/TPPEquipmentComponent.h"
 #include "TPPAbilitySetManager.h"
 

@@ -4,7 +4,7 @@
 #include "TPPAbilitySet.h"
 #include "AbilitySystemComponent.h"
 
-void UTPPAbilitySet::GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& Handles)
+void UTPPAbilitySet::GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, UObject* SourceObject, TArray<FGameplayAbilitySpecHandle>& Handles)
 {
 	if (!ensureAlways(AbilitySystemComponent))
 	{
@@ -15,7 +15,7 @@ void UTPPAbilitySet::GiveAbilities_ReturnHandles(UAbilitySystemComponent* Abilit
 	{
 		if (BindInfo.GameplayAbilityClass)
 		{
-			const FGameplayAbilitySpecHandle PrimaryHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(BindInfo.GameplayAbilityClass, 1, (int32)BindInfo.Command));
+			const FGameplayAbilitySpecHandle PrimaryHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(BindInfo.GameplayAbilityClass, 1, (int32)BindInfo.Command, SourceObject));
 			if (PrimaryHandle.IsValid())
 			{
 				Handles.Add(PrimaryHandle);
@@ -24,7 +24,8 @@ void UTPPAbilitySet::GiveAbilities_ReturnHandles(UAbilitySystemComponent* Abilit
 	}
 }
 
-void UTPPAbilitySet::GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& PrimarySpecHandles, TArray<FGameplayAbilitySpecHandle>& SecondarySpecHandles, TArray<FGameplayAbilitySpecHandle>& AuxiliarySpecHandles, TArray<FGameplayAbilitySpecHandle>& PassiveAbilityHandles, FGameplayAbilitySpecHandle& JumpAbilityHandle, FGameplayAbilitySpecHandle& MeleeAbilityHandle, FGameplayAbilitySpecHandle& UltimateAbilityHandle) const
+
+void UTPPAbilitySet_Character::GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& PrimarySpecHandles, TArray<FGameplayAbilitySpecHandle>& SecondarySpecHandles, TArray<FGameplayAbilitySpecHandle>& AuxiliarySpecHandles, TArray<FGameplayAbilitySpecHandle>& PassiveAbilityHandles, FGameplayAbilitySpecHandle& JumpAbilityHandle, FGameplayAbilitySpecHandle& MeleeAbilityHandle, FGameplayAbilitySpecHandle& UltimateAbilityHandle) const
 {
 	if (!ensureAlways(AbilitySystemComponent))
 	{
@@ -81,7 +82,7 @@ void UTPPAbilitySet::GiveAbilities_ReturnHandles(UAbilitySystemComponent* Abilit
 
 	if (UltimateAbility.GameplayAbilityClass)
 	{
-		UltimateAbilityHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(UltimateAbility.GameplayAbilityClass, 1, (int32)EGameplayAbilityInputBinds::Ability3));
+		UltimateAbilityHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(UltimateAbility.GameplayAbilityClass, 1, (int32)EGameplayAbilityInputBinds::Ability5));
 	}
 
 	if (JumpAbility.GameplayAbilityClass)
@@ -93,6 +94,6 @@ void UTPPAbilitySet::GiveAbilities_ReturnHandles(UAbilitySystemComponent* Abilit
 	if (MeleeAbility.GameplayAbilityClass)
 	{
 		// Ability 5 is melee.
-		JumpAbilityHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(MeleeAbility.GameplayAbilityClass, 1, (int32)EGameplayAbilityInputBinds::Ability5));
+		JumpAbilityHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(MeleeAbility.GameplayAbilityClass, 1, (int32)EGameplayAbilityInputBinds::Ability6));
 	}
 }

@@ -8,6 +8,7 @@
 #include "AbilitySystemComponent.h"
 #include "Interfaces/AbilityForceTarget.h"
 #include "AbilitySystemInterface.h"
+#include "TPPAbilitySystemComponent.h"
 #include "ThirdPersonProjCharacter.generated.h"
 
 class USpringArmComponent;
@@ -16,7 +17,6 @@ class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 class UTPPMovementComponent;
-class UTPPAbilitySystemComponent;
 class UTPPAbilitySetManager;
 class UTPPEquipmentComponent;
 

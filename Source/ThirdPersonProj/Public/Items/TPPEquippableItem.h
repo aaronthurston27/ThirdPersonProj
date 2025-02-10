@@ -9,7 +9,7 @@
 #include "TPPEquippableItem.generated.h"
 
 class UTPPAbility;
-class UTPPAbilitySet;
+class UTPPAbilitySet_Equipment;
 class UTPPEquipmentComponent;
 class UAbilitySystemComponent;
 class AThirdPersonProjCharacter;
@@ -73,10 +73,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	USkeletalMeshComponent* SkeletalMesh;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TWeakObjectPtr<UTPPAbilitySet> AbilitiesToGrant;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	TWeakObjectPtr<UTPPAbilitySet_Equipment> AbilitiesToGrant;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Equip")
 	FEquipItemData EquipData;
 
 	UPROPERTY(BlueprintReadOnly, Transient)
@@ -114,6 +114,9 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	UAbilitySystemComponent* GetOwnerAbilitySystem() const;
+
+	UFUNCTION(BlueprintPure)
+	EEquippableState GetEquippableState() const;
 
 protected:
 

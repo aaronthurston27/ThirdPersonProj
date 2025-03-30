@@ -21,4 +21,11 @@ public:
 	
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
 	static TArray<FHitResult> GetOverlappingActorsInRadius(const UObject* WorldContextObject, const FVector& Origin, const float Radius, const TArray<AActor*>& IgnoreActors, bool bRequireLOS = true, bool bDrawDebug = false);
+	bool RaySphereIntersection(const FVector& RayDirection, const FVector& RayOrigin, const FVector& SphereCenter, const float Radius, FVector& Intersect1);
+	float ShortestDistanceToPlane(const FVector& Point, const FVector& PlaneNormal, const FVector& PointOnPlane);
+	FVector ClosestPointOnLine(const FVector& Point, const FVector& LineStart, const FVector& LineEnd);
+	bool IsActorAimingAtBack(const FVector& ActorLocation, const FVector& ActorDirection, const FVector& TargetLocation, const FVector& TargetDirection);
+	bool SphereAABBIntersection(const FVector& SphereCenter, const float SphereRadius, const FVector BoxCenter, const FVector BoxExtents);
+	void ComputeSlopeOrientation(FVector& ForwardDirection, FVector& SlopeNormal, FVector& OutForward, FVector& OutUp);
+	bool RayPlaneIntersection(const FVector& RayDirection, const FVector& RayOrigin, const FVector& PointOnPlane, const FVector& PlaneNormal);
 };

@@ -30,7 +30,7 @@ TArray<FHitResult> UTPPFunctionLibrary::GetAllOverlapsWithinCone(const UObject* 
 
 	if (bDrawDebug)
 	{
-		UKismetSystemLibrary::DrawDebugConeInDegrees(World, ConeOrigin, ConeRotation.Vector(), ConeLength, ConeWidthAngle, ConeHeightAngle, 12, FColor::Green, 14.0f, .4f);
+		UKismetSystemLibrary::DrawDebugConeInDegrees(World, ConeOrigin, ConeRotation.Vector(), ConeLength, ConeWidthAngle / 2.0f, ConeHeightAngle / 2.0f, 12, FColor::Green, 14.0f, .4f);
 		//DrawDebugSphere(World, SweepPosition, SphereCollision.GetSphereRadius(), 16.0f, FColor::Red, false, 14, 0, .3f);
 	}
 	World->SweepMultiByObjectType(OutHits, ConeOrigin, SweepPosition, ConeRotation.Quaternion(), FCollisionObjectQueryParams::AllDynamicObjects, SphereCollision, QueryParams);
@@ -55,7 +55,7 @@ TArray<FHitResult> UTPPFunctionLibrary::GetAllOverlapsWithinCone(const UObject* 
 		FRotator Rotation = UKismetMathLibrary::MakeRotFromX(OriginToHitLocation) - ConeRotation;
 		Rotation.Normalize();
 
-		if (FMath::Abs(Rotation.Yaw) > ConeWidthAngle  || FMath::Abs(Rotation.Pitch) > ConeHeightAngle)
+		if (FMath::Abs(Rotation.Yaw) > (ConeWidthAngle / 2.0f)  || FMath::Abs(Rotation.Pitch) > (ConeHeightAngle / 2.0f))
 		{
 			continue;
 		}
@@ -115,4 +115,109 @@ TArray<FHitResult> UTPPFunctionLibrary::GetOverlappingActorsInRadius(const UObje
 	}
 
 	return OverlapsToReturn;
+}
+
+bool UTPPFunctionLibrary::RaySphereIntersection(const FVector& RayDirection, const FVector& RayOrigin, const FVector& SphereCenter, const float Radius, FVector& Intersect1)
+{
+	const FVector L = RayOrigin - SphereCenter;
+	float a = RayDirection | RayDirection;
+	float b = 2 * (L | RayDirection);
+	float c = (L | L) - (Radius * Radius);
+
+	float t1, t2;
+	const float discriminant = (b * b) - (4 * a * c);
+	if (discriminant > 0)
+	{
+		t1 = (-b - sqrt(discriminant)) / (2 * a);
+		t2 = (-b + sqrt(discriminant)) / (2 * a);
+		t1 = FMath::Max(0, t1);
+		t2 = FMath::Max(0, t2);
+
+		Intersect1 = RayOrigin + (RayDirection * FMath::Min(t1, t2));
+	}
+	else if (discriminant == 0.0f)
+	{
+		t1 = -b / (2 * a);
+		Intersect1 = RayOrigin + (RayDirection * t1);
+	}
+	else
+	{
+		return false;
+	}
+
+	return true;
+}
+
+float UTPPFunctionLibrary::ShortestDistanceToPlane(const FVector& Point, const FVector& PlaneNormal, const FVector& PointOnPlane)
+{
+	// Assume plane normal is normalized.
+	const FVector L = Point - PointOnPlane;
+	const float Point_PlaneDot = L | PlaneNormal;
+	const FVector ProjectedPoint = Point_PlaneDot * PlaneNormal;
+	return (ProjectedPoint - Point).Size();
+}
+
+FVector UTPPFunctionLibrary::ClosestPointOnLine(const FVector& Point, const FVector& LineStart, const FVector& LineEnd)
+{
+	const FVector Segment = LineEnd - LineStart;
+	const FVector PointToStart = Point - LineStart;
+
+	const float Point_SegmentDot = PointToStart | Segment;
+	if (Point_SegmentDot <= 0)
+	{
+		return LineStart;
+	}
+	else if (Point_SegmentDot >= (Segment | Segment))
+	{
+		return LineEnd;
+	}
+
+	const FVector Projection = ((Segment | PointToStart) / (Segment | Segment)) * Segment;
+	return LineStart + Projection;
+
+}
+
+bool UTPPFunctionLibrary::IsActorAimingAtBack(const FVector& ActorLocation, const FVector& ActorDirection, const FVector& TargetLocation, const FVector& TargetDirection)
+{
+	const float Target_ToActorDot = (TargetLocation - ActorLocation) | ActorDirection;
+	if (Target_ToActorDot <= 0)
+	{
+		return false;
+	}
+
+	const float DirectionDot = TargetDirection | ActorDirection;
+	return DirectionDot >= .75f;
+}
+
+bool UTPPFunctionLibrary::SphereAABBIntersection(const FVector& SphereCenter, const float SphereRadius, const FVector BoxCenter, const FVector BoxExtents)
+{
+	const FVector BoxMinPoints = BoxCenter - BoxExtents;
+	const FVector BoxMaxPoints = BoxCenter + BoxExtents;
+
+	const FVector ClosestPoint = FVector(FMath::Clamp(BoxMinPoints.X, SphereCenter.X, BoxMaxPoints.X), FMath::Clamp(BoxMinPoints.Y, SphereCenter.Y, BoxMaxPoints.Y), FMath::Clamp(BoxMinPoints.Z, SphereCenter.Z, BoxMaxPoints.Z));
+	return (ClosestPoint - BoxCenter).SizeSquared() <= SphereRadius * SphereRadius;
+}
+
+void UTPPFunctionLibrary::ComputeSlopeOrientation(FVector& ForwardDirection, FVector& SlopeNormal, FVector& OutForward, FVector& OutUp)
+{
+	if (!ForwardDirection.IsNearlyZero() && !SlopeNormal.IsNearlyZero())
+	{
+		ForwardDirection = ForwardDirection.GetSafeNormal();
+		SlopeNormal = SlopeNormal.GetSafeNormal();
+
+		const FVector NewRight = ForwardDirection.GetSafeNormal() ^ SlopeNormal.GetSafeNormal();
+		const FVector NewForward = SlopeNormal.GetSafeNormal() ^ NewRight.GetSafeNormal();
+
+		OutForward = NewForward;
+		OutUp = SlopeNormal;
+	}
+}
+
+bool UTPPFunctionLibrary::RayPlaneIntersection(const FVector& RayDirection, const FVector& RayOrigin, const FVector& PointOnPlane, const FVector& PlaneNormal)
+{
+	float Normal_OriginDot = RayOrigin | PlaneNormal;
+	float Normal_PlanePointDot = PointOnPlane | PlaneNormal;
+	float Normal_DirectionDot = RayDirection | PlaneNormal;
+	const float t = (Normal_PlanePointDot - Normal_OriginDot) / Normal_DirectionDot;
+	return t >= 0;
 }

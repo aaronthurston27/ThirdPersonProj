@@ -10,5 +10,6 @@ FVector UTPPAbility_Tornado::FindTornadoSpawnLocation() const
 
 bool UTPPAbility_Tornado::IsValidTornadoSpawnLocation(const FVector& SpawnLocation) const
 {
+	GetOwningActorFromActorInfo()->GetActorTransform().Rotator();
 	return (GetOwningActorFromActorInfo()->GetActorLocation() - SpawnLocation).Size() >= MinimumTornadoSpawnDistance;
 }

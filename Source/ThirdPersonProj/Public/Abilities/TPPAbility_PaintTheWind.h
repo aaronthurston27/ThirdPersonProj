@@ -15,13 +15,13 @@ struct FGameplayAbilityTargetData_WindPaint : public FGameplayAbilityTargetData
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(BlueprintReadOnly)
-	FVector StartingPosition;
+	FVector StartingPosition = FVector::ZeroVector;
 
 	UPROPERTY(BlueprintReadOnly)
-	FVector PathCenterPoint;
+	FVector PathCenterPoint = FVector::ZeroVector;
 
 	UPROPERTY(BlueprintReadOnly)
-	FVector WindTravelDirection;
+	FVector WindTravelDirection = FVector::ZeroVector;
 };
 
 /**

@@ -73,10 +73,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	USkeletalMeshComponent* SkeletalMesh;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Item|Abilities")
 	TWeakObjectPtr<UTPPAbilitySet_Equipment> AbilitiesToGrant;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Equip")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Item|Equip")
 	FEquipItemData EquipData;
 
 	UPROPERTY(BlueprintReadOnly, Transient)

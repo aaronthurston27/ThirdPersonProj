@@ -133,7 +133,6 @@ FVector UTPPAbility_PaintTheWind::GetTargetWindDirection() const
 		}
 
 		// If wind path is travelling parallel to the player's look vector, horizontal (y axis) key input should curve the path to the players right or left.
-		// Else, if the wind path is travelling perpindicular, curve left/right relative to the wind path.
 		if (FMath::Abs(WindDirection_PathToCenterDot) > .8f)
 		{
 			if (FMath::Abs(LocalSpaceVector_ToRotate.Z) == 1.0f)
@@ -144,6 +143,7 @@ FVector UTPPAbility_PaintTheWind::GetTargetWindDirection() const
 			return CenterToOwner_Vec.Rotation().RotateVector(LocalSpaceVector_ToRotate);
 		}
 
+		// Else, if the wind path is travelling perpindicular, curve left/right relative to the wind path.
 		if (FMath::Abs(LocalSpaceVector_ToRotate.Z) == 1.0f)
 		{
 			// If only pitching up, don't move past the max pitch. Don't move at 90 degrees to avoid gimbal lock.

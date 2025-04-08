@@ -74,7 +74,7 @@ protected:
 	USkeletalMeshComponent* SkeletalMesh;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Item|Abilities")
-	TWeakObjectPtr<UTPPAbilitySet_Equipment> AbilitiesToGrant;
+	TSoftObjectPtr<UTPPAbilitySet_Equipment> AbilitiesToGrant;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Item|Equip")
 	FEquipItemData EquipData;

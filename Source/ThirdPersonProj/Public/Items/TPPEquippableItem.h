@@ -110,6 +110,9 @@ public:
 	void DropItem();
 
 	UFUNCTION(BlueprintPure)
+	UTPPEquipmentComponent* GetOwnerEquipmentComp() const;
+
+	UFUNCTION(BlueprintPure)
 	AThirdPersonProjCharacter* GetOwnerCharacter() const;
 
 	UFUNCTION(BlueprintPure)

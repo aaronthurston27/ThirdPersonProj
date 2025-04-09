@@ -53,10 +53,14 @@ bool UTPPEquipmentComponent::PickupItem(ATPPEquippableItem* ItemToPickup)
 
 ATPPEquippableItem* UTPPEquipmentComponent::DropCurrentItem()
 {
-	if (CurrentEquippedItem)
+	if (CurrentEquippedItem && CurrentEquippedItem->CanUnequip())
 	{
 		ATPPEquippableItem* OldItem = CurrentEquippedItem;
-		OldItem->DropItem();
+		CurrentEquippedItem->DropItem();
+
+		check(CurrentEquippedItem->GetOwnerEquipmentComp() == nullptr);
+
+		CurrentEquippedItem = nullptr;
 		return OldItem;
 	}
 

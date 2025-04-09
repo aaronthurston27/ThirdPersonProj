@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "TPPAbilitySetManager.h"
+#include "AbilitySystem/TPPAbilitySetManager.h"
 #include "ThirdPersonProj/ThirdPersonProjCharacter.h"
-#include "TPPAbilitySet.h"
+#include "AbilitySystem/TPPAbilitySet.h"
 #include "Abilities/TPPAbility.h"
-#include "TPPAbilitySystemComponent.h"
+#include "AbilitySystem/TPPAbilitySystemComponent.h"
 
 // Sets default values for this component's properties
 UTPPAbilitySetManager::UTPPAbilitySetManager()

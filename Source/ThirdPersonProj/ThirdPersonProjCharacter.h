@@ -8,7 +8,7 @@
 #include "AbilitySystemComponent.h"
 #include "Interfaces/AbilityForceTarget.h"
 #include "AbilitySystemInterface.h"
-#include "TPPAbilitySystemComponent.h"
+#include "AbilitySystem/TPPAbilitySystemComponent.h"
 #include "ThirdPersonProjCharacter.generated.h"
 
 class USpringArmComponent;

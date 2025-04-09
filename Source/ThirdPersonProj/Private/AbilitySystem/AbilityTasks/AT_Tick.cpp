@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AbilityTasks/AT_Tick.h"
+#include "AbilitySystem/AbilityTasks/AT_Tick.h"
 
 UAT_Tick::UAT_Tick(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

@@ -12,7 +12,7 @@
 #include "InputActionValue.h"
 #include "TPPMovementComponent.h"
 #include "Items/TPPEquipmentComponent.h"
-#include "TPPAbilitySetManager.h"
+#include "AbilitySystem/TPPAbilitySetManager.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 

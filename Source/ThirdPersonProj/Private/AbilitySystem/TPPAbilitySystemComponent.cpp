@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "TPPAbilitySystemComponent.h"
+#include "AbilitySystem/TPPAbilitySystemComponent.h"
 #include "GameplayAbilitySet.h"
 #include "ThirdPersonProj/ThirdPersonProjCharacter.h"
 

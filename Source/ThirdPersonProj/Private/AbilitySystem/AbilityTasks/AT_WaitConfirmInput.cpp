@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AbilityTasks/AT_WaitConfirmInput.h"
+#include "AbilitySystem/AbilityTasks/AT_WaitConfirmInput.h"
 #include "AbilitySystemComponent.h"
 
 void UAT_WaitConfirmInput::OnConfirmCallback()

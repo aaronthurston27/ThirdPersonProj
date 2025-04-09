@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "TPPAbilitySet.h"
+#include "AbilitySystem/TPPAbilitySet.h"
 #include "AbilitySystemComponent.h"
 
 void UTPPAbilitySet::GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, UObject* SourceObject, TArray<FGameplayAbilitySpecHandle>& Handles)

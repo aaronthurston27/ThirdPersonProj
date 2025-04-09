@@ -4,7 +4,7 @@
 #include "Items/TPPEquippableItem.h"
 #include "AbilitySystemInterface.h"
 #include "Abilities/TPPEquipmentAbility.h"
-#include "TPPAbilitySystemComponent.h"
+#include "AbilitySystem/TPPAbilitySystemComponent.h"
 #include "ThirdPersonProj/ThirdPersonProjCharacter.h"
 #include "Items/TPPEquipmentComponent.h"
 
@@ -137,6 +137,11 @@ void ATPPEquippableItem::DropItem()
 	OwnerEquipmentComp = nullptr;
 }
 
+UTPPEquipmentComponent* ATPPEquippableItem::GetOwnerEquipmentComp() const
+{
+	return OwnerEquipmentComp.Get();
+}
+
 AThirdPersonProjCharacter* ATPPEquippableItem::GetOwnerCharacter() const
 {
 	if (!OwnerEquipmentComp.IsValid())
@@ -260,9 +265,10 @@ void ATPPEquippableItem::GrantEquippableAbilities()
 	UAbilitySystemComponent* AbilitySystemComp = GetOwnerAbilitySystem();
 	check(AbilitySystemComp);
 
-	if (AbilitiesToGrant.IsValid())
+	UTPPAbilitySet_Equipment* AbilitySet = AbilitiesToGrant.LoadSynchronous();
+	if (AbilitySet)
 	{
-		AbilitiesToGrant.Get()->GiveAbilities_ReturnHandles(AbilitySystemComp, this, GrantedAbilities);
+		AbilitySet->GiveAbilities_ReturnHandles(AbilitySystemComp, this, GrantedAbilities);
 	}
 
 }
@@ -270,10 +276,9 @@ void ATPPEquippableItem::GrantEquippableAbilities()
 void ATPPEquippableItem::RemoveEquippableAbilities()
 {
 	UTPPAbilitySystemComponent* AbilitySystemComp = Cast<UTPPAbilitySystemComponent>(GetOwnerAbilitySystem());
-	if (AbilitySystemComp)
-	{
-		AbilitySystemComp->ClearAbilities(GrantedAbilities);
-	}
+	check(AbilitySystemComp);
+	
+	AbilitySystemComp->ClearAbilities(GrantedAbilities);
 
 	GrantedAbilities.Empty();
 }

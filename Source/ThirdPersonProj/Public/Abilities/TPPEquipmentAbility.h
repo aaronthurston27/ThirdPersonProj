@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/TPPAbility.h"
-#include "TPPAbilitySet.h"
+#include "AbilitySystem/TPPAbilitySet.h"
 #include "TPPEquipmentAbility.generated.h"
 
 class ATPPEquippableItem;

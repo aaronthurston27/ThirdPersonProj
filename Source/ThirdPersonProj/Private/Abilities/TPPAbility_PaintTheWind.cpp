@@ -4,7 +4,7 @@
 #include "Abilities/TPPAbility_PaintTheWind.h"
 #include "AbilityActors/AbilityActor_WindPath.h"
 #include "ThirdPersonProj/ThirdPersonProjCharacter.h"
-#include "TPPAbilitySystemComponent.h"
+#include "AbilitySystem/TPPAbilitySystemComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 void UTPPAbility_PaintTheWind::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)

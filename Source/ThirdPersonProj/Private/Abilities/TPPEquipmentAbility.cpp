@@ -8,12 +8,10 @@
 UTPPEquipmentAbility::UTPPEquipmentAbility(const FObjectInitializer& ObjectInitializer)
 {
 	bShouldAbilityRespondToInput = true;
-	bRespondToInputWhenInactive = true;
 }
 
 void UTPPEquipmentAbility::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
-	SetAbilityInputResponse(true);
 	Super::OnGiveAbility(ActorInfo, Spec);
 }
 

@@ -37,12 +37,6 @@ protected:
 	bool bShouldAbilityAutoActivate = false;
 
 	UPROPERTY(EditDefaultsOnly)
-	bool bCancelAbilityOnAbilityTagBlock = false;
-
-	UPROPERTY(EditDefaultsOnly)
-	bool bRespondToInputWhenInactive = false;
-
-	UPROPERTY(EditDefaultsOnly)
 	bool bCancelAbilityOnUnequip = true;
 
 	UPROPERTY(Transient)
@@ -63,9 +57,6 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	bool ShouldCancelAbilityOnUnequip() const { return bCancelAbilityOnUnequip;  }
-
-	UFUNCTION(BlueprintPure)
-	bool ShouldAbilityRespondToInputWhenInactive() const { return bRespondToInputWhenInactive; }
 
 	UFUNCTION(BlueprintPure)
 	bool IsAbilityInputPressed() const;

@@ -2,6 +2,7 @@
 
 
 #include "TPPMovementComponent.h"
+#include "TPP_NativeGameplayTags.h"
 #include "ThirdPersonProj/ThirdPersonProjCharacter.h"
 
 FVector UTPPMovementComponent::ConstrainInputAcceleration(const FVector& InputAcceleration) const
@@ -42,10 +43,24 @@ FVector UTPPMovementComponent::ConsumeInputVector()
 void UTPPMovementComponent::SetWantsToRun(bool bNewWantsToRun)
 {
 	bWantsToRun = bNewWantsToRun;
+	bWantsToRun &= CanCharacterRun();
+
 	if (bWantsToRun)
 	{
 		SetWantsToWalk(false);
 	}
+}
+
+bool UTPPMovementComponent::CanCharacterRun() const
+{
+	AThirdPersonProjCharacter* TPPCharacter = Cast<AThirdPersonProjCharacter>(GetOwner());
+	check(TPPCharacter);
+	if (TPPCharacter->GetAbilitySystemComponent()->HasMatchingGameplayTag(TAG_Movement_BlockSprint))
+	{
+		return false;
+	}
+
+	return true;
 }
 
 void UTPPMovementComponent::SetWantsToWalk(bool bNewWantsToWalk)
@@ -55,9 +70,4 @@ void UTPPMovementComponent::SetWantsToWalk(bool bNewWantsToWalk)
 	{
 		SetWantsToRun(false);
 	}
-}
-
-void UTPPMovementComponent::SetIsGliding(bool bNewIsGliding)
-{
-	bIsGliding = bNewIsGliding;
 }

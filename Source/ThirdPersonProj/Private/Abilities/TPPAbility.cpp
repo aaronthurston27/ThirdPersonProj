@@ -14,10 +14,7 @@ void UTPPAbility::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, cons
 {
 	Super::OnGiveAbility(ActorInfo, Spec);
 	CachedCharacterOwner = Cast<AThirdPersonProjCharacter>(ActorInfo->AvatarActor);
-	if (!bRespondToInputWhenInactive)
-	{
-		bShouldAbilityRespondToInput = false;
-	}
+	SetAbilityInputResponse(true);
 }
 
 void UTPPAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -42,10 +39,7 @@ void UTPPAbility::OnAbilityUnequipped_Implementation()
 		CancelAbility(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo, true);
 	}
 
-	if (!ShouldAbilityRespondToInputWhenInactive())
-	{
-		SetAbilityInputResponse(false);
-	}
+	SetAbilityInputResponse(false);
 }
 
 void UTPPAbility::SetAbilityInputResponse(bool bShouldRespondToInput)
@@ -55,7 +49,7 @@ void UTPPAbility::SetAbilityInputResponse(bool bShouldRespondToInput)
 
 bool UTPPAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
 {
-	if (!bShouldAbilityRespondToInput && !bRespondToInputWhenInactive)
+	if (!bShouldAbilityRespondToInput)
 	{
 		return false;
 	}

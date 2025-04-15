@@ -159,11 +159,13 @@ protected:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnJumped OnJumpedEvent;
+	
+	virtual bool CanJumpInternal_Implementation() const;
+
+protected:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnTryAddForceToOwner OnReceiveForce;
-
-protected:
 
 	void ReceiveForce_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Force, const FGameplayTagContainer ForceTagContainer, const FName BoneName = FName(TEXT("None"))) override;
 };

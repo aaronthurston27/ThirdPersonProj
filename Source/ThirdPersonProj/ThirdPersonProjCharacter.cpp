@@ -12,6 +12,7 @@
 #include "InputActionValue.h"
 #include "TPPMovementComponent.h"
 #include "Items/TPPEquipmentComponent.h"
+#include "TPP_NativeGameplayTags.h"
 #include "AbilitySystem/TPPAbilitySetManager.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -103,6 +104,18 @@ UTPPMovementComponent* AThirdPersonProjCharacter::GetThirdPersonMovementComponen
 void AThirdPersonProjCharacter::OnJumped_Implementation()
 {
 	OnJumpedEvent.Broadcast();
+}
+
+bool AThirdPersonProjCharacter::CanJumpInternal_Implementation() const
+{
+	check(TPPAbilitySystemComponent);
+
+	if (TPPAbilitySystemComponent->HasMatchingGameplayTag(TAG_Movement_BlockJump))
+	{
+		return false;
+	}
+
+	return Super::CanJumpInternal_Implementation();
 }
 
 void AThirdPersonProjCharacter::ReceiveForce_Implementation(const AActor* ActorSource, const UActorComponent* SourceComponent, const UActorComponent* TargetComponent, const FVector& Force, const FGameplayTagContainer ForceTagContainer, const FName BoneName)

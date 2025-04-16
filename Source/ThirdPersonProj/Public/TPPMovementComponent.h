@@ -14,6 +14,8 @@ class THIRDPERSONPROJ_API UTPPMovementComponent : public UCharacterMovementCompo
 {
 	GENERATED_BODY()
 
+	virtual void BeginPlay() override;
+
 	virtual FVector ConstrainInputAcceleration(const FVector& InputAcceleration) const;
 
 	virtual FRotator GetDeltaRotation(float DeltaTime) const;
@@ -22,10 +24,10 @@ class THIRDPERSONPROJ_API UTPPMovementComponent : public UCharacterMovementCompo
 
 protected:
 
-	UPROPERTY(Transient, BlueprintReadOnly)
+	UPROPERTY(Transient)
 	bool bWantsToRun = false;
 
-	UPROPERTY(Transient, BlueprintReadOnly)
+	UPROPERTY(Transient)
 	bool bWantsToWalk = false;
 
 public:
@@ -43,6 +45,11 @@ public:
 	void SetWantsToWalk(bool bNewWantsToWalk);
 
 	UFUNCTION(BlueprintPure)
-	bool DoesCharacterWantToWalk() const { return bWantsToWalk; }
+	bool DoesCharacterWantToWalk() const;
+
+protected:
+
+	UFUNCTION()
+	void OnBlockSprintTagChanged(const FGameplayTag Tag, int32 NewCount);
 	
 };

@@ -215,7 +215,6 @@ void AThirdPersonProjCharacter::OnWalkPressed(const FInputActionValue& Value)
 	if (MoveComp)
 	{
 		const bool bDoesCharacterWantToWalk = MoveComp->DoesCharacterWantToWalk();
-		MoveComp->SetWantsToWalk(!bDoesCharacterWantToWalk);
 	}
 }
 

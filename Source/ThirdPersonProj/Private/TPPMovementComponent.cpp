@@ -3,7 +3,21 @@
 
 #include "TPPMovementComponent.h"
 #include "TPP_NativeGameplayTags.h"
+#include "AbilitySystemComponent.h"
 #include "ThirdPersonProj/ThirdPersonProjCharacter.h"
+
+void UTPPMovementComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	AThirdPersonProjCharacter* TPPCharacter = Cast<AThirdPersonProjCharacter>(GetOwner());
+	check(TPPCharacter);
+
+	UAbilitySystemComponent* ASC = TPPCharacter->GetAbilitySystemComponent();
+	check(ASC);
+
+	ASC->RegisterGameplayTagEvent(TAG_Movement_BlockSprint, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &UTPPMovementComponent::OnBlockSprintTagChanged);
+}
 
 FVector UTPPMovementComponent::ConstrainInputAcceleration(const FVector& InputAcceleration) const
 {
@@ -59,6 +73,10 @@ bool UTPPMovementComponent::CanCharacterRun() const
 	{
 		return false;
 	}
+	if (TPPCharacter->GetAbilitySystemComponent()->HasMatchingGameplayTag(TAG_Movement_ForceWalk))
+	{
+		return false;
+	}
 
 	return true;
 }
@@ -69,5 +87,21 @@ void UTPPMovementComponent::SetWantsToWalk(bool bNewWantsToWalk)
 	if (bWantsToWalk)
 	{
 		SetWantsToRun(false);
+	}
+}
+
+bool UTPPMovementComponent::DoesCharacterWantToWalk() const
+{
+	AThirdPersonProjCharacter* TPPCharacter = Cast<AThirdPersonProjCharacter>(GetOwner());
+	check(TPPCharacter);
+
+	return bWantsToWalk || TPPCharacter->GetAbilitySystemComponent()->HasMatchingGameplayTag(TAG_Movement_ForceWalk);
+}
+
+void UTPPMovementComponent::OnBlockSprintTagChanged(const FGameplayTag Tag, int32 NewCount)
+{
+	if (NewCount > 0)
+	{
+		bWantsToRun = false;
 	}
 }

@@ -6,3 +6,4 @@
 UE_DEFINE_GAMEPLAY_TAG(TAG_Movement_BlockJump, "Movement.BlockJump");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Movement_BlockSprint, "Movement.BlockSprint");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Movement_Gliding, "Movement.Gliding");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Movement_ForceWalk, "Movement.ForceWalk");

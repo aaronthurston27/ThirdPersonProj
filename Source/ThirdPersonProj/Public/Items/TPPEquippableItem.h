@@ -9,7 +9,7 @@
 #include "TPPEquippableItem.generated.h"
 
 class UTPPAbility;
-class UTPPAbilitySet_Equipment;
+class UTPPEquipmentAbilitySet;
 class UTPPEquipmentComponent;
 class UAbilitySystemComponent;
 class AThirdPersonProjCharacter;
@@ -73,8 +73,11 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	USkeletalMeshComponent* SkeletalMesh;
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Item|Data")
+	FName ItemId = NAME_None;
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Item|Abilities")
-	TSoftObjectPtr<UTPPAbilitySet_Equipment> AbilitiesToGrant;
+	TSoftObjectPtr<UTPPEquipmentAbilitySet> AbilitiesToGrant;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Item|Equip")
 	FEquipItemData EquipData;
@@ -143,9 +146,9 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void BP_OnEquipStateChanged(EEquippableState PrevState, EEquippableState NewState);
 
-	void GrantEquippableAbilities();
+	virtual void GrantEquippableAbilities();
 
-	void RemoveEquippableAbilities();
+	virtual void RemoveEquippableAbilities();
 
 protected:
 
@@ -153,6 +156,11 @@ protected:
 	bool bHasGrantedAbilties = false;
 
 	UPROPERTY(Transient)
-	TArray<FGameplayAbilitySpecHandle> GrantedAbilities;
+	FGameplayAbilitySpecHandle PrimaryAbilityHandle;
+	
+	UPROPERTY(Transient)
+	FGameplayAbilitySpecHandle SecondaryAbilityHandle;
+
+	virtual TArray<FGameplayAbilitySpecHandle> GetGrantedAbilities() const;
 
 };

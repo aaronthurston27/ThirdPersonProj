@@ -265,11 +265,13 @@ void ATPPEquippableItem::GrantEquippableAbilities()
 	UAbilitySystemComponent* AbilitySystemComp = GetOwnerAbilitySystem();
 	check(AbilitySystemComp);
 
-	UTPPAbilitySet_Equipment* AbilitySet = AbilitiesToGrant.LoadSynchronous();
+	UTPPEquipmentAbilitySet* AbilitySet = AbilitiesToGrant.LoadSynchronous();
 	if (AbilitySet)
 	{
-		AbilitySet->GiveAbilities_ReturnHandles(AbilitySystemComp, this, GrantedAbilities);
+		AbilitySet->GiveAbilities_ReturnHandles(AbilitySystemComp, this, PrimaryAbilityHandle, SecondaryAbilityHandle);
 	}
+
+	bHasGrantedAbilties = true;
 
 }
 
@@ -278,8 +280,18 @@ void ATPPEquippableItem::RemoveEquippableAbilities()
 	UTPPAbilitySystemComponent* AbilitySystemComp = Cast<UTPPAbilitySystemComponent>(GetOwnerAbilitySystem());
 	check(AbilitySystemComp);
 	
+	TArray<FGameplayAbilitySpecHandle> GrantedAbilities = GetGrantedAbilities();
 	AbilitySystemComp->ClearAbilities(GrantedAbilities);
 
-	GrantedAbilities.Empty();
+	PrimaryAbilityHandle = FGameplayAbilitySpecHandle();
+	SecondaryAbilityHandle = FGameplayAbilitySpecHandle();
+}
+
+TArray<FGameplayAbilitySpecHandle> ATPPEquippableItem::GetGrantedAbilities() const
+{
+	TArray<FGameplayAbilitySpecHandle> GrantedAbilities;
+	GrantedAbilities.Add(PrimaryAbilityHandle);
+	GrantedAbilities.Add(SecondaryAbilityHandle);
+	return GrantedAbilities;
 }
 

@@ -13,9 +13,37 @@ class ATPPEquippableItem;
  *
  */
 UCLASS(Blueprintable, BlueprintType)
-class THIRDPERSONPROJ_API UTPPAbilitySet_Equipment : public UTPPAbilitySet
+class THIRDPERSONPROJ_API UTPPEquipmentAbilitySet : public UTPPAbilitySet
+{
+
+public:
+
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, Category = AbilitySet)
+	FGameplayAbilityBindInfo PrimaryAbility;
+
+	UPROPERTY(EditAnywhere, Category = AbilitySet)
+	FGameplayAbilityBindInfo SecondaryAbility;
+
+	void GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, UObject* SourceObject, FGameplayAbilitySpecHandle& PrimaryAbilityHandle, FGameplayAbilitySpecHandle& SecondaryAbilityHandle);
+
+};
+
+/**
+ *
+ */
+UCLASS(Blueprintable, BlueprintType)
+class THIRDPERSONPROJ_API UTPPEquipmentAbilitySet_Firearm : public UTPPEquipmentAbilitySet
 {
 	GENERATED_BODY()
+
+	public:
+
+	UPROPERTY(EditAnywhere, Category = AbilitySet)
+	FGameplayAbilityBindInfo ReloadAbility;
+
+	void GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, UObject* SourceObject, FGameplayAbilitySpecHandle& PrimaryAbilityHandle, FGameplayAbilitySpecHandle& SecondaryAbilityHandle, FGameplayAbilitySpecHandle& ReloadHandle);
 };
 
 /**

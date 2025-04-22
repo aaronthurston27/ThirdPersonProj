@@ -12,13 +12,9 @@ class UTPPAbility;
  * 
  */
 UCLASS(Blueprintable, BlueprintType)
-class THIRDPERSONPROJ_API UTPPAbilitySet : public UGameplayAbilitySet
+class THIRDPERSONPROJ_API UTPPAbilitySet : public UDataAsset
 {
 	GENERATED_BODY()
-
-public:
-
-	void GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, UObject* SourceObject, TArray<FGameplayAbilitySpecHandle>& Handles);
 };
 
 
@@ -28,22 +24,26 @@ class THIRDPERSONPROJ_API UTPPAbilitySet_Character : public UTPPAbilitySet
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, Category = AbilitySet, meta = (DisplayAfter = "Abilities"))
+
+	UPROPERTY(EditAnywhere, Category = AbilitySet)
+	TArray<FGameplayAbilityBindInfo> PrimaryAbilities;
+
+	UPROPERTY(EditAnywhere, Category = AbilitySet)
 	TArray<FGameplayAbilityBindInfo> SecondaryAbilities;
 
-	UPROPERTY(EditAnywhere, Category = AbilitySet, meta = (DisplayAfter = "Abilities"))
+	UPROPERTY(EditAnywhere, Category = AbilitySet)
 	TArray<FGameplayAbilityBindInfo> AuxiliaryAbilities;
 
-	UPROPERTY(EditAnywhere, Category = AbilitySet, meta = (DisplayAfter = "Abilities"))
+	UPROPERTY(EditAnywhere, Category = AbilitySet)
 	FGameplayAbilityBindInfo UltimateAbility;
 
-	UPROPERTY(EditAnywhere, Category = AbilitySet, meta = (DisplayAfter = "Abilities"))
+	UPROPERTY(EditAnywhere, Category = AbilitySet)
 	FGameplayAbilityBindInfo JumpAbility;
 
-	UPROPERTY(EditAnywhere, Category = AbilitySet, meta = (DisplayAfter = "Abilities"))
+	UPROPERTY(EditAnywhere, Category = AbilitySet)
 	FGameplayAbilityBindInfo MeleeAbility;
 
-	UPROPERTY(EditAnywhere, Category = AbilitySet, meta = (DisplayAfter = "Abilities"))
+	UPROPERTY(EditAnywhere, Category = AbilitySet)
 	TArray <TSubclassOf<UGameplayAbility>> PassiveAbilities;
 
 	void GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& PrimarySpecHandles, TArray<FGameplayAbilitySpecHandle>& SecondarySpecHandles, TArray<FGameplayAbilitySpecHandle>& AuxiliarySpecHandles, TArray<FGameplayAbilitySpecHandle>& PassiveAbilityHandles,

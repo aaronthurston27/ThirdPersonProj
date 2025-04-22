@@ -4,27 +4,6 @@
 #include "AbilitySystem/TPPAbilitySet.h"
 #include "AbilitySystemComponent.h"
 
-void UTPPAbilitySet::GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, UObject* SourceObject, TArray<FGameplayAbilitySpecHandle>& Handles)
-{
-	if (!ensureAlways(AbilitySystemComponent))
-	{
-		return;
-	}
-
-	for (const FGameplayAbilityBindInfo& BindInfo : Abilities)
-	{
-		if (BindInfo.GameplayAbilityClass)
-		{
-			const FGameplayAbilitySpecHandle PrimaryHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(BindInfo.GameplayAbilityClass, 1, (int32)BindInfo.Command, SourceObject));
-			if (PrimaryHandle.IsValid())
-			{
-				Handles.Add(PrimaryHandle);
-			}
-		}
-	}
-}
-
-
 void UTPPAbilitySet_Character::GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, TArray<FGameplayAbilitySpecHandle>& PrimarySpecHandles, TArray<FGameplayAbilitySpecHandle>& SecondarySpecHandles, TArray<FGameplayAbilitySpecHandle>& AuxiliarySpecHandles, TArray<FGameplayAbilitySpecHandle>& PassiveAbilityHandles, FGameplayAbilitySpecHandle& JumpAbilityHandle, FGameplayAbilitySpecHandle& MeleeAbilityHandle, FGameplayAbilitySpecHandle& UltimateAbilityHandle) const
 {
 	if (!ensureAlways(AbilitySystemComponent))
@@ -32,7 +11,7 @@ void UTPPAbilitySet_Character::GiveAbilities_ReturnHandles(UAbilitySystemCompone
 		return;
 	}
 
-	for (const FGameplayAbilityBindInfo& BindInfo : Abilities)
+	for (const FGameplayAbilityBindInfo& BindInfo : PrimaryAbilities)
 	{
 		if (BindInfo.GameplayAbilityClass)
 		{

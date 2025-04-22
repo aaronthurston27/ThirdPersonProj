@@ -38,3 +38,20 @@ bool UTPPEquipmentAbility::CanActivateAbility(const FGameplayAbilitySpecHandle H
 
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
+
+void UTPPEquipmentAbilitySet::GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, UObject* SourceObject, FGameplayAbilitySpecHandle& PrimaryAbilityHandle, FGameplayAbilitySpecHandle& SecondaryAbilityHandle)
+{
+	check(AbilitySystemComponent);
+
+	PrimaryAbilityHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(PrimaryAbility.GameplayAbilityClass, 1, (int32)PrimaryAbility.Command, SourceObject));
+	SecondaryAbilityHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(SecondaryAbility.GameplayAbilityClass, 1, (int32)SecondaryAbility.Command, SourceObject));
+}
+
+void UTPPEquipmentAbilitySet_Firearm::GiveAbilities_ReturnHandles(UAbilitySystemComponent* AbilitySystemComponent, UObject* SourceObject, FGameplayAbilitySpecHandle& PrimaryAbilityHandle, FGameplayAbilitySpecHandle& SecondaryAbilityHandle, FGameplayAbilitySpecHandle& ReloadHandle)
+{
+	check(AbilitySystemComponent);
+
+	PrimaryAbilityHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(PrimaryAbility.GameplayAbilityClass, 1, (int32)PrimaryAbility.Command, SourceObject));
+	SecondaryAbilityHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(SecondaryAbility.GameplayAbilityClass, 1, (int32)SecondaryAbility.Command, SourceObject));
+	ReloadHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(ReloadAbility.GameplayAbilityClass, 1, (int32)ReloadAbility.Command, SourceObject));
+}
